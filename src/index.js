@@ -25,8 +25,8 @@ const client = new Client({
     ],
 });
 
-// generate a 6 digits random code
-let generatedCode = Math.floor(Math.random() * (999999 - 100000) + 100000);
+// create a new map object to store user id as key and generated code as value
+let generatedCode = new Map();
 
 // create initial message and embed
 client.on(Events.MessageCreate, (message) => {
@@ -121,6 +121,15 @@ client.on(Events.InteractionCreate, async (interaction) => {
                     ),
                 ]);
             
+            // return if user id is not a key in generatedCode map
+            if (!generatedCode.has(interaction.user.id)){
+                interaction.reply({
+                    content: 'Something went wrong, please try again from the beginning.', 
+                    ephemeral: true,
+                });
+                return;
+            }
+
             await interaction.showModal(EmailModal);
         }
     }
@@ -136,7 +145,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
             // parse domain from user email input
             const domain = emailInput.split('@')[1];
 
-            // list of acceptable domains
+            // set of acceptable domains
             const AcceptedDomains = new Set(allowedDomains);
 
             // return if user email isn't from an acceptable domain
@@ -173,8 +182,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
                     { name: 'Signature', value: `${signatureInput}` },
                 )
             
-            // send email to user input email and set generatedCode to randomly generated code from email
-            generatedCode = await email.verifyEmail(emailInput).catch(console.error);
+            // send email to user input email, append user id as key and generated code sent through email as value
+            generatedCode.set(interaction.user.id, await email.verifyEmail(emailInput).catch(console.error));
             
             interaction.reply({
                 embeds: [EmailEmbed],
@@ -187,13 +196,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
         if (interaction.customId === 'email-verification-modal') {
             const codeInput = interaction.fields.getTextInputValue('code-input').trim();
 
-            // compare generated code with user input code
-            // if correct, assign role and reset generated code
-            if (generatedCode == codeInput) {
+            // get value of generated code corresponding to user id and compare value with user input code
+            // if correct, assign role and delete user entry
+            if (generatedCode.get(interaction.user.id) == codeInput) {
                 interaction.member.roles.add(roleId);
                 console.log(`${interaction.member.user.username} is now an Active Member.\n`);
 
-                generatedCode = Math.floor(Math.random() * (999999 - 100000) + 100000);
+                // delete user entry from map
+                generatedCode.delete(interaction.user.id);
 
                 interaction.reply({
                     content: 'You have completed Active Member Verification and unlocked channels!', 
@@ -203,7 +213,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
             }
 
             interaction.reply({
-                content: `Your verification code is incorrect, please try again!`, 
+                content: 'Your verification code is incorrect, please try again!', 
                 ephemeral: true,
             });
         }
