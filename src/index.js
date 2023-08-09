@@ -15,14 +15,37 @@ const {
 
 const email = require('./email.js');
 
-const { token, channelId, roleId, allowedDomains } = require('../config.json');
+const { token, channelId, roleId, allowedDomains, organization } = require('../config.json');
 
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMembers,
         GatewayIntentBits.GuildMessages,
         GatewayIntentBits.MessageContent,
     ],
+});
+
+// send welcome message and instructions when new user joins guild
+client.on(Events.GuildMemberAdd, (member) => {
+    const welcome = fs.readFileSync('./templates/welcome.txt').toString();
+
+    const WelcomeEmbed = new EmbedBuilder()
+        .setColor(0xCFC2E9)
+        .setTitle(`Welcome to ${organization}`)
+        .setURL('https://github.com/SapphireGaze/discord-verification')
+        .setAuthor({
+            name: `${organization}`, 
+            iconURL: 'https://logodix.com/logo/557580.png', 
+        })
+        .setDescription(welcome);
+
+    member.send({
+        content: `Hello ${member.user.username}, welcome to ${organization}!`,
+        embeds: [WelcomeEmbed],
+    });
+
+    console.log(`${member.user.username} has joined the guild!\n`);
 });
 
 // create a new map object to store user id as key and generated code as value
@@ -51,7 +74,7 @@ client.on(Events.MessageCreate, (message) => {
         .setTitle('Active Member Verification')
         .setURL('https://github.com/SapphireGaze/discord-verification')
         .setAuthor({
-            name: 'Member Verification Bot', 
+            name: `${organization}`, 
             iconURL: 'https://logodix.com/logo/557580.png', 
         })
         .setDescription(agreement);
@@ -106,6 +129,15 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
         // check id of button interaction to see if it's email verification button
         if (interaction.customId === 'email-verification-button') {
+            // return if user id is not a key in generatedCode map
+            if (!generatedCode.has(interaction.user.id)){
+                interaction.reply({
+                    content: 'Something went wrong, please try again from the beginning.', 
+                    ephemeral: true,
+                });
+                return;
+            }
+
             // build email verification modal
             const EmailModal = new ModalBuilder()
                 .setCustomId('email-verification-modal')
@@ -120,15 +152,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
                             .setRequired(true),
                     ),
                 ]);
-            
-            // return if user id is not a key in generatedCode map
-            if (!generatedCode.has(interaction.user.id)){
-                interaction.reply({
-                    content: 'Something went wrong, please try again from the beginning.', 
-                    ephemeral: true,
-                });
-                return;
-            }
 
             await interaction.showModal(EmailModal);
         }
@@ -172,7 +195,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 .setTitle('Email Verification')
                 .setURL('https://github.com/SapphireGaze/discord-verification')
                 .setAuthor({
-                    name: 'Member Verification Bot', 
+                    name: `${organization}`, 
                     iconURL: 'https://logodix.com/logo/557580.png', 
                 })
                 .setDescription('You will receive an email with a code shortly. ' +
@@ -180,10 +203,20 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 .addFields(
                     { name: 'Email', value: `${emailInput}` },
                     { name: 'Signature', value: `${signatureInput}` },
-                )
+                );
             
             // send email to user input email, append user id as key and generated code sent through email as value
             generatedCode.set(interaction.user.id, await email.verifyEmail(emailInput).catch(console.error));
+
+            // delete entry if code didn't generate successfully
+            if (generatedCode.get(interaction.user.id) == null) {
+                generatedCode.delete(interaction.user.id);
+                interaction.reply({
+                    content: 'Verification email failed to send, please contact a discord moderator to resolve this issue.',
+                    ephemeral: true,
+                });
+                return;
+            }
             
             interaction.reply({
                 embeds: [EmailEmbed],
@@ -200,6 +233,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
             // if correct, assign role and delete user entry
             if (generatedCode.get(interaction.user.id) == codeInput) {
                 interaction.member.roles.add(roleId);
+                interaction.member.send('You have completed Active Member Verification and unlocked channels. ' +
+                'Please keep this DM as receipt.');
                 console.log(`${interaction.member.user.username} is now an Active Member.\n`);
 
                 // delete user entry from map
@@ -221,7 +256,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 });
 
 client.on(Events.ClientReady, () => {
-    console.log(`Currently logged in as ${client.user.tag}!\n`);
+    console.log(`Currently logged in as ${client.user.tag}.\n`);
 });
 
 client.login(token);
