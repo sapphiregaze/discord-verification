@@ -6,7 +6,6 @@ const {
     Client,
     Events,
     GatewayIntentBits,
-    InteractionType,
     ModalBuilder,
     TextInputBuilder,
     TextInputStyle,
@@ -14,6 +13,7 @@ const {
 } = require('discord.js');
 
 const email = require('./email.js');
+const sheets = require('./sheets.js')
 
 const { token, channelId, roleId, allowedDomains, organization } = require('../config.json');
 
@@ -158,7 +158,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
 
     // check if interaction type is modal submit
-    if (interaction.type === InteractionType.ModalSubmit) {
+    if (interaction.isModalSubmit()) {
         // check if the modal submit is from initial modal
         if (interaction.customId === 'initial-modal') {
             // obtain input from modal fields
@@ -218,6 +218,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 return;
             }
             
+            // append info to google sheets if email sent successfully
+            await sheets.write(interaction.user.username, emailInput, signatureInput).catch(console.error);
+
             interaction.reply({
                 embeds: [EmailEmbed],
                 components: [EmailButton], 

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const nodemailer = require('nodemailer');
 
-const { emailAddress } = require('../config.json');
+const { senderEmail } = require('../config.json');
 
 // get verification email html content and load content 
 let html = fs.readFileSync('./templates/verification.html').toString();
@@ -44,16 +44,16 @@ function modifyHTML() {
 }
 
 // send email to passed in parameter address with modified verification html and return generated code
-module.exports.verifyEmail = async function (email) {
+module.exports.verifyEmail = async function (receiverEmail) {
 	const code = modifyHTML();
 
 	const info = await transporter.sendMail({
-		from: emailAddress,
-		to: email,
+		from: senderEmail,
+		to: receiverEmail,
 		subject: 'Discord Member Verification Code',
 		html: html,
 	});
-	console.log(`Message sent to ${email}: ${info.messageId} with the verification code ${code}.\n`);
+	console.log(`Message sent to ${receiverEmail}: ${info.messageId} with the verification code ${code}.\n`);
 
 	return code;
 }
