@@ -13,7 +13,8 @@ const {
 } = require('discord.js');
 
 const email = require('./email.js');
-const sheets = require('./sheets.js')
+const sheets = require('./sheets.js');
+const util = require('./logger.js');
 
 const { token, channelId, roleId, allowedDomains, organization } = require('../config.json');
 
@@ -45,7 +46,7 @@ client.on(Events.GuildMemberAdd, (member) => {
         embeds: [WelcomeEmbed],
     });
 
-    console.log(`${member.user.username} has joined the guild!\n`);
+    util.logger.info(`${member.user.username} has joined the guild!`);
 });
 
 // create a new map object to store user id as key and generated code as value
@@ -131,8 +132,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
         if (interaction.customId === 'email-verification-button') {
             // return if user id is not a key in generatedCode map
             if (!generatedCode.has(interaction.user.id)){
+                util.logger.warn(`${interaction.user.username} user data not stored in runtime.`);
                 interaction.reply({
-                    content: 'Something went wrong, please try again from the beginning.', 
+                    content: 'Something went wrong, please restart from the beginning.', 
                     ephemeral: true,
                 });
                 return;
@@ -173,6 +175,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
             // return if user email isn't from an acceptable domain
             if (!AcceptedDomains.has(domain)) {
+                util.logger.info(`${interaction.user.username} has entered an invalid email: ${emailInput}.`);
                 interaction.reply({
                     content: 'Please resubmit the form with your university email.', 
                     ephemeral: true,
@@ -206,11 +209,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 );
             
             // send email to user input email, append user id as key and generated code sent through email as value
-            generatedCode.set(interaction.user.id, await email.verifyEmail(emailInput).catch(console.error));
-
-            // delete entry if code didn't generate successfully
-            if (generatedCode.get(interaction.user.id) == null) {
-                generatedCode.delete(interaction.user.id);
+            try {
+                generatedCode.set(interaction.user.id, await email.verifyEmail(emailInput));
+            } catch (error) {
+                util.logger.error(`${interaction.user.username} user request to SMTP server failed.`);
+                console.log(error);
                 interaction.reply({
                     content: 'Verification email failed to send, please contact a discord moderator to resolve this issue.',
                     ephemeral: true,
@@ -219,8 +222,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
             }
             
             // append info to google sheets if email sent successfully
-            await sheets.write(interaction.user.username, emailInput, signatureInput).catch(console.error);
-
+            try {
+                await sheets.write(interaction.user.username, emailInput, signatureInput);
+            } catch (error) {
+                util.logger.error(`Failed to write ${interaction.user.username} user data to Google Sheets.`);
+                console.log(error);
+            }
+            
             interaction.reply({
                 embeds: [EmailEmbed],
                 components: [EmailButton], 
@@ -238,7 +246,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 interaction.member.roles.add(roleId);
                 interaction.member.send('You have completed Active Member Verification and unlocked channels. ' +
                 'Please keep this DM as receipt.');
-                console.log(`${interaction.member.user.username} is now an Active Member.\n`);
+                util.logger.info(`${interaction.member.user.username} is now an Active Member.`);
 
                 // delete user entry from map
                 generatedCode.delete(interaction.user.id);
@@ -250,6 +258,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 return;
             }
 
+            util.logger.info(`${interaction.member.user.username} has entered incorrect verification code.`);
             interaction.reply({
                 content: 'Your verification code is incorrect, please try again!', 
                 ephemeral: true,
@@ -260,6 +269,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 client.on(Events.ClientReady, () => {
     console.log(`Currently logged in as ${client.user.tag}.\n`);
+    util.logger.info(`Application logged in as ${client.user.tag}.`);
 });
 
 client.login(token);

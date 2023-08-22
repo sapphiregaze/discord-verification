@@ -4,3 +4,4 @@ config.json
 credentials.json
 welcome.txt
 agreement.txt
+*.log

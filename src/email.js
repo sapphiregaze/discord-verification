@@ -1,6 +1,8 @@
 const fs = require('fs');
 const nodemailer = require('nodemailer');
 
+const util = require('./logger.js');
+
 const { senderEmail } = require('../config.json');
 
 // get verification email html content and load content 
@@ -53,7 +55,7 @@ module.exports.verifyEmail = async function (receiverEmail) {
 		subject: 'Discord Member Verification Code',
 		html: html,
 	});
-	console.log(`Message sent to ${receiverEmail}: ${info.messageId} with the verification code ${code}.\n`);
+	util.logger.info(`Email sent to ${receiverEmail}: ${info.messageId} with the verification code ${code}.`);
 
 	return code;
 }
