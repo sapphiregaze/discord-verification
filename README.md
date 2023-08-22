@@ -13,19 +13,19 @@ Node.js v18.13.0 or above
 Clone this repository to local machine using 
 
 ```
-git clone https://github.com/SapphireGaze/discord-verification
-cd discord-verification
+git clone https://github.com/SapphireGaze/discord-verification.git
+cd discord-verification/
 ```
 
 and change directory into the cloned repository.
-Intsall the required dependencies by running 
+Install the required dependencies by running 
 
 ```
 npm ci 
 ```
 
 from the current repository.
-Then, create a new file at the root of the repository named `config.json`, and the content of the file should follow the below format:
+Then, create a new file at the root of the repository named `config.json`, and the content of the file should follow the below JSON format:
 
 ```
 {
@@ -43,20 +43,20 @@ Then, create a new file at the root of the repository named `config.json`, and t
 }
 ```
 
-After the configuration, change into `src` directory
+After the configuration, save the file and change into `src` directory with the below command:
 
 ```
 cd src/
 ```
 
-and open `email.js`, change the nodemailer transporter to your desired SMTP server with the correct port.
+and open `email.js`, change the nodemailer transporter to the designated SMTP server with the correct port.
 Then you can save the file, and run the following command to start the bot! 
 
 ``` 
 node index.js
 ```
 
-Type "verify" in the channel corresponding to your specified channel id to show the modal!!
+Type "verify" in the channel corresponding to the configured channel id to show the initial modal!!
 
 ### **Google Cloud Platform**
 
