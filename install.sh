@@ -1,7 +1,20 @@
 
 # install dependencies 
-sudo apt install -y npm || {
-   echo "Failed to run 'apt install npm', aborting bot install "
+
+
+sudo apt update -y  || {
+   echo "Failed to run 'apt update', aborting bot install "
+   exit 1; 
+}
+
+sudo apt upgrade -y  || {
+   echo "Failed to run 'apt upgrade', aborting bot install "
+   exit 1; 
+}
+
+
+sudo apt install -y nodejs npm || {
+   echo "Failed to run 'apt install nodejs npm', aborting bot install "
    exit 1; 
 }
 
@@ -11,13 +24,17 @@ npm install || {
 }
 
 npm ci || {
-   echo "Failed to run 'npm cit', aborting bot install "
+   echo "Failed to run 'npm ci', aborting bot install "
    exit 1; 
 }
 
+sudo n stable || {
+   echo "Failed to run 'sudo n stable', aborting bot install "
+   exit 1; 
+}
 
 cd src
-sed "s@WorkingDirectory=@WorkingDirectory=$PWD@g" ../discord-verification.service | sed "s@ExecStart=@ExecStart=`which node` $PWD\/index.js@g" | sudo tee /etc/systemd/system/discord-verification.service 
+sed "s@WorkingDirectory=@WorkingDirectory=$PWD@g" ../discord-verification.service | sed "s@ExecStart=@ExecStart=/usr/local/bin/node $PWD\/index.js@g" | sudo tee /etc/systemd/system/discord-verification.service 
 
 
 if [ ! -f ../config.json ]
