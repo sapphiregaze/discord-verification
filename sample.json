@@ -1,0 +1,12 @@
+{
+   "token": "YOUR-TOKEN-HERE",
+   "channelId": "934994165085896724",
+   "roleId": "996158253446746165",
+   "spreadsheetId": "1KkqVlp5rQuggi-hDGa_LKsAZE-I1pKyQ91dKxSCn8qQ",
+   "allowedDomains": [
+       "nevada.unr.edu",
+       "unr.edu"
+   ],
+   "senderEmail": "\"Nevada Cyber Club\" <no-reply@nevadacyberclub.com>",
+   "organization": "Nevada Cyber Club"
+}

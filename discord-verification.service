@@ -1,0 +1,12 @@
+[Unit]
+Description=Verification bot for NCC Discord server
+
+[Service]
+WorkingDirectory=
+Type=simple
+ExecStart=
+Restart=always
+
+
+[Install]
+WantedBy=multi-user.target
