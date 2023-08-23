@@ -2,6 +2,4 @@ node_modules
 temp
 config.json
 credentials.json
-welcome.txt
-agreement.txt
 *.log
