@@ -64,4 +64,20 @@ Create a new project in [Google Cloud Platform](https://console.cloud.google.com
 
 ### **Discord Developer Portal**
 
-Create a new application in [Discord Developer Portal](https://discord.com/developers/applications), then navigate to `Bot` and enable `Server Members Intent` **AND** `Message Content Intent` under `Privileged Gateway Intents`. Finally, click on `Reset Token` and copy the token as `token` into the `config.json` file previously created.                                                                                                                 
+Create a new application in [Discord Developer Portal](https://discord.com/developers/applications), then navigate to `Bot` and enable `Server Members Intent` **AND** `Message Content Intent` under `Privileged Gateway Intents`. Finally, click on `Reset Token` and copy the token as `token` into the `config.json` file previously created.
+
+Add the following permission when inviting the bot to the server:
+- Manage Roles
+- Manage Channels 
+- Read Messages/View Channels                                                                        
+- Send Messages
+- Send TTS Messages
+- Manage Messages
+- Embed Links  
+- Read Message History
+
+
+
+Make sure the bot's default role is above the target permissions you want the bot to edit!!!!
+
+Invite the bot!

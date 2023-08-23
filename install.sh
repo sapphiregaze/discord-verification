@@ -12,12 +12,19 @@ if [ ! -f config.json ]
 then
    read BOT_TOKEN
    sed "s/YOUR-TOKEN-HERE/$BOT_TOKEN/g" sample.json | tee config.json
-   sudo systemctl start discord-verification
 else
-   echo "Found config file!"
-   echo "Run 'sudo systemctl start discord-verification' after adding configuration file."   
+   echo "Found config file!"   
 fi
 
+if [ ! -f credentials.json ]
+then
+   echo "Sheet credentials found!"
+else
+   echo "Sheet credentials NOT found! Please add credentials.json to root of project."
+fi
+
+
+echo "Run 'sudo systemctl start discord-verification' after adding configuration file."   
 
 sudo systemctl enable discord-verification
 
