@@ -1,7 +1,19 @@
 
 # install dependencies 
-sudo apt install -y npm
-npm ci 
+sudo apt install -y npm || {
+   echo "Failed to run 'apt install npm', aborting bot install "
+   exit 1; 
+}
+
+npm install || {
+   echo "Failed to run 'npm install', aborting bot install "
+   exit 1; 
+}
+
+npm ci || {
+   echo "Failed to run 'npm cit', aborting bot install "
+   exit 1; 
+}
 
 
 cd src
