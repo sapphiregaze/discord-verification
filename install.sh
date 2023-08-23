@@ -17,7 +17,7 @@ npm ci || {
 
 
 cd src
-sed "s@WorkingDirectory=@WorkingDirectory=$PWD@g" ../discord-verification.service | sed "s@ExecStart=@ExecStart=`which node` $PWD\/index.js@g" - | sudo tee /etc/systemd/system/discord-verification.service 
+sed "s@WorkingDirectory=@WorkingDirectory=$PWD@g" ../discord-verification.service | sed "s@ExecStart=@ExecStart=`which node` $PWD\/index.js@g" | sudo tee /etc/systemd/system/discord-verification.service 
 
 
 if [ ! -f ../config.json ]
