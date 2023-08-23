@@ -11,14 +11,23 @@ const $ = require('cheerio').load(html);
 
 // create transporter for nodemailer
 const transporter = nodemailer.createTransport({
-	host: 'localhost',
+	host: 'smtp.unr.edu',
 	port: 587,
 	requireTLS: true,
-	secure: false,
-	tls: {
-		rejectUnauthorized: false
-	},
+	secure: false
 });
+
+// loacl debuggind
+// const transporter = nodemailer.createTransport({
+// 	host: 'localhost',
+// 	port: 587,
+// 	requireTLS: true,
+// 	secure: false,
+// 		tls: {
+// 			rejectUnauthorized: false
+// 		},
+// });
+
 
 // generate 6 digits random code
 function generateCode() {
