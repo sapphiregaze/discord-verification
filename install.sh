@@ -17,18 +17,18 @@ npm ci || {
 
 
 cd src
-sed "s@WorkingDirectory=@WorkingDirectory=$PWD@g" discord-verification.service | sed "s@ExecStart=@ExecStart=`which node` $PWD\/index.js@g" - | sudo tee /etc/systemd/system/discord-verification.service 
+sed "s@WorkingDirectory=@WorkingDirectory=$PWD@g" ../discord-verification.service | sed "s@ExecStart=@ExecStart=`which node` $PWD\/index.js@g" - | sudo tee /etc/systemd/system/discord-verification.service 
 
 
-if [ ! -f config.json ]
+if [ ! -f ../config.json ]
 then
    read BOT_TOKEN
-   sed "s/YOUR-TOKEN-HERE/$BOT_TOKEN/g" sample.json | tee config.json
+   sed "s/YOUR-TOKEN-HERE/$BOT_TOKEN/g" ../sample.json | tee ../config.json
 else
    echo "Found config file!"   
 fi
 
-if [ ! -f credentials.json ]
+if [ ! -f ../credentials.json ]
 then
    echo "Sheet credentials found!"
 else
