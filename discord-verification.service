@@ -1,0 +1,12 @@
+[Unit]
+Description=automate discord member verification process
+
+[Service]
+WorkingDirectory=
+Type=simple
+ExecStart=
+Restart=always
+
+
+[Install]
+WantedBy=multi-user.target

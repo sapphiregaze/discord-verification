@@ -8,7 +8,15 @@
 
 Node.js v18.13.0 or above
 
-### **General Configuration**
+### **Automatic Configuration** (May not work)
+
+Run the below command from the root directory:
+
+```
+sh install.sh
+```
+
+### **Manual Configuration**
 
 Clone this repository to local machine using 
 
@@ -25,7 +33,7 @@ npm ci
 ```
 
 from the current repository.
-Then, create a new file at the root of the repository named `config.json`, and the content of the file should follow the below JSON format:
+Then, create a new file at the root of the repository named `config.json` (check `sample.json` format), and the content of the file should follow the below JSON format:
 
 ```
 {
