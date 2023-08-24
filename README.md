@@ -49,10 +49,18 @@ After the configuration, save the file and change into `src` directory with the 
 cd src/
 ```
 
-and open `email.js`, change the nodemailer transporter to the designated SMTP server with the correct port.
-Then you can save the file, and run the following command to start the bot! 
+and open `email.js`, change the nodemailer transporter to the designated SMTP server with the correct port and protocols.
+Then, change into `templates` directory 
+
+```
+cd templates/
+```
+
+and create `agreement.txt` (store your server user agreement) and create `welcome.txt` (store message to send to user on join). 
+Then you can save the files, and run the following command to start the bot! 
 
 ``` 
+cd ../
 node index.js
 ```
 
@@ -64,4 +72,15 @@ Create a new project in [Google Cloud Platform](https://console.cloud.google.com
 
 ### **Discord Developer Portal**
 
-Create a new application in [Discord Developer Portal](https://discord.com/developers/applications), then navigate to `Bot` and enable `Server Members Intent` **AND** `Message Content Intent` under `Privileged Gateway Intents`. Finally, click on `Reset Token` and copy the token as `token` into the `config.json` file previously created.                                                                                                                 
+Create a new application in [Discord Developer Portal](https://discord.com/developers/applications), then navigate to `Bot` and enable `Server Members Intent` **AND** `Message Content Intent` under `Privileged Gateway Intents`. Finally, click on `Reset Token` and copy the token as `token` into the `config.json` file previously created.   
+Add the following permission when inviting the bot to the server:
+- Manage Roles
+- Manage Channels
+- Read Messages/View Channels
+- Send Messages
+- Send TTS Messages
+- Manage Messages
+- Embed Links
+- Read Message History
+
+Make sure the bot's default role is above the target role permissions you want the bot to edit!!
