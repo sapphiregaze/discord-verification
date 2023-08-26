@@ -1,6 +1,6 @@
 # Discord Member Verification
 
-### Automate discord verification process using nodemailer/SMTP server to verify email, assign role with Discord.js, and store member information using Google Sheets API.
+### Automate discord verification process using nodemailer/SMTP server to verify email, assign role with Discord.js, and store member information using Google Sheets API and winston.
 
 ## **Setup**
 
@@ -26,6 +26,7 @@ cd discord-verification/
 ```
 
 and change directory into the cloned repository.
+
 Install the required dependencies by running 
 
 ```
@@ -33,6 +34,7 @@ npm ci
 ```
 
 from the current repository.
+
 Then, create a new file at the root of the repository named `config.json` (check `sample.json` format), and the content of the file should follow the below JSON format:
 
 ```
@@ -58,6 +60,7 @@ cd src/
 ```
 
 and open `email.js`, change the nodemailer transporter to the designated SMTP server with the correct port and protocols.
+
 Then, change into `templates` directory 
 
 ```
@@ -65,6 +68,7 @@ cd templates/
 ```
 
 and create `agreement.txt` (store your server user agreement) and create `welcome.txt` (store message to send to user on join). 
+
 Then you can save the files, and run the following command to start the bot! 
 
 ``` 
@@ -81,7 +85,9 @@ Create a new project in [Google Cloud Platform](https://console.cloud.google.com
 ### **Discord Developer Portal**
 
 Create a new application in [Discord Developer Portal](https://discord.com/developers/applications), then navigate to `Bot` and enable `Server Members Intent` **AND** `Message Content Intent` under `Privileged Gateway Intents`. Finally, click on `Reset Token` and copy the token as `token` into the `config.json` file previously created.   
+
 Add the following permission when inviting the bot to the server:
+
 - Manage Roles
 - Manage Channels
 - Read Messages/View Channels

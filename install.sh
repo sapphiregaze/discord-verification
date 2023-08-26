@@ -29,7 +29,6 @@ sudo n stable || {
 cd src
 sed "s@WorkingDirectory=@WorkingDirectory=$PWD@g" ../discord-verification.service | sed "s@ExecStart=@ExecStart=`which node` $PWD\/index.js@g" | sudo tee /etc/systemd/system/discord-verification.service 
 
-
 if [ ! -f ../config.json ]
 then
    read BOT_TOKEN
@@ -45,11 +44,6 @@ else
    echo "Sheet credentials NOT found! Please add credentials.json to root of project."
 fi
 
-
 echo "Run 'sudo systemctl start discord-verification' after adding configuration file."   
 
 sudo systemctl enable discord-verification
-
-
-
-

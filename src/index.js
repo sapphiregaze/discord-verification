@@ -215,8 +215,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
             try {
                 generatedCode.set(interaction.user.id, await email.verifyEmail(emailInput));
             } catch (error) {
-                util.logger.error(`${interaction.user.username} user request to SMTP server failed.`);
                 console.log(error);
+                util.logger.error(`${interaction.user.username} user request to SMTP server failed.`);
+
                 await interaction.followUp({
                     content: 'Verification email failed to send, please contact a discord moderator to resolve this issue.',
                     ephemeral: true,
@@ -228,8 +229,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
             try {
                 await sheets.write(interaction.user.username, emailInput, signatureInput);
             } catch (error) {
-                util.logger.error(`Failed to write ${interaction.user.username} user data to Google Sheets.`);
                 console.log(error);
+                util.logger.error(`Failed to write ${interaction.user.username} user data to Google Sheets.`);
             }
             
             await interaction.followUp({
@@ -250,11 +251,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 await interaction.member.send('You have completed Active Member Verification and unlocked channels. ' +
                 'Please keep this DM as receipt.');
 
-                util.logger.info(`${interaction.member.user.username} is now an Active Member.`);
-
                 // delete user entry from map
                 generatedCode.delete(interaction.user.id);
 
+                util.logger.info(`${interaction.member.user.username} is now an Active Member.`);
                 await interaction.followUp({
                     content: 'You have completed Active Member Verification and unlocked channels!', 
                     ephemeral: true,
