@@ -5,10 +5,6 @@ const util = require('./logger.js');
 
 const { senderEmail } = require('../config.json');
 
-// get verification email html content and load content 
-let html = fs.readFileSync('./templates/verification.html').toString();
-const $ = require('cheerio').load(html);
-
 // create transporter for nodemailer
 const transporter = nodemailer.createTransport({
 	host: 'localhost',
@@ -26,9 +22,12 @@ function generateCode() {
 }
 
 // replace default 000000 code in html page with random generated code
-function modifyHTML() {
+function modifyHTML(code) {
+	// get verification email html content and load content 
+	let html = fs.readFileSync('./templates/verification.html').toString();
+	const $ = require('cheerio').load(html);
+
 	const replaceRegex = /000000/;
-	const code = generateCode();
 
 	const getTextNodes = (elem) => elem.type === 'text'?[]:
         elem.contents().toArray()
@@ -42,12 +41,13 @@ function modifyHTML() {
 
 	html = $.html();
 
-	return code;
+	return html;
 }
 
 // send email to passed in parameter address with modified verification html and return generated code
 module.exports.verifyEmail = async function (receiverEmail) {
-	const code = modifyHTML();
+	const code = generateCode();
+	const html = modifyHTML(code);
 
 	const info = await transporter.sendMail({
 		from: senderEmail,

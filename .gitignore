@@ -1,7 +1,9 @@
-node_modules
-temp
-config.json
-credentials.json
-welcome.txt
-agreement.txt
+/node_modules
+
+/config.json
+/credentials.json
+
+/src/templates/welcome.txt
+/src/templates/agreement.txt
+
 *.log
