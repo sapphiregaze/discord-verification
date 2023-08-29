@@ -173,18 +173,34 @@ client.on(Events.InteractionCreate, async (interaction) => {
             const emailInput = interaction.fields.getTextInputValue('email-input').trim();
             const signatureInput = interaction.fields.getTextInputValue('signature-input').trim();
 
-            // parse domain from user email input
-            const emailUsername = emailInput.split('@')[0];
-            const domain = emailInput.split('@')[1];
+            // validate email with regex
+            const validateEmail = (email) => {
+                return String(email)
+                    .toLowerCase()
+                    .match(
+                        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+                    );
+            };
 
-            const userEmail = emailUsername + '@' + domain;
+            if (!validateEmail(emailInput)) {
+                util.logger.info(`${interaction.user.username} has entered an invalid email: ${emailInput}.`);
+                await interaction.followUp({
+                    content: 'Invalid email format, please try again.',
+                    ephemeral: true,
+                });
+                return;
+            }
+
+            // parse domain from user email input
+            const validatedEmail = validateEmail(emailInput)[0];
+            const domain = validatedEmail.split('@')[1];
 
             // set of acceptable domains
             const AcceptedDomains = new Set(allowedDomains);
 
             // return if user email isn't from an acceptable domain
             if (!AcceptedDomains.has(domain)) {
-                util.logger.info(`${interaction.user.username} has entered an invalid email: ${userEmail}.`);
+                util.logger.info(`${interaction.user.username} has entered an email with invalid domain: ${validatedEmail}.`);
                 await interaction.followUp({
                     content: 'Please resubmit the form with your university email.', 
                     ephemeral: true,
@@ -213,7 +229,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 .setDescription('You will receive an email with a code shortly. ' +
                     'Please enter the code below to confirm your information is correct.')
                 .addFields(
-                    { name: 'Email', value: `${userEmail}` },
+                    { name: 'Email', value: `${validatedEmail}` },
                     { name: 'Signature', value: `${signatureInput}` },
                 );
             
@@ -221,10 +237,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
             try {
                 // reset user attempts to 0 everytime new code generates
                 attempts.set(interaction.user.id, 0);
-                generatedCode.set(interaction.user.id, await email.verifyEmail(userEmail));
+                generatedCode.set(interaction.user.id, await email.verifyEmail(validatedEmail));
             } catch (error) {
                 console.log(error);
-                util.logger.error(`${interaction.user.username} user request to SMTP server failed with email: ${userEmail}.`);
+                util.logger.error(`${interaction.user.username} user request to SMTP server failed with email: ${validatedEmail}.`);
 
                 await interaction.followUp({
                     content: 'Verification email failed to send, please contact a discord moderator to resolve this issue.',
@@ -235,7 +251,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
             
             // append info to google sheets if email sent successfully
             try {
-                await sheets.write(interaction.user.username, userEmail, signatureInput);
+                await sheets.write(interaction.user.username, validatedEmail, signatureInput);
             } catch (error) {
                 console.log(error);
                 util.logger.error(`Failed to write ${interaction.user.username} user data to Google Sheets.`);
