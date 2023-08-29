@@ -171,14 +171,17 @@ client.on(Events.InteractionCreate, async (interaction) => {
             const signatureInput = interaction.fields.getTextInputValue('signature-input').trim();
 
             // parse domain from user email input
+            const emailUsername = emailInput.split('@')[0];
             const domain = emailInput.split('@')[1];
+
+            const userEmail = emailUsername + '@' + domain;
 
             // set of acceptable domains
             const AcceptedDomains = new Set(allowedDomains);
 
             // return if user email isn't from an acceptable domain
             if (!AcceptedDomains.has(domain)) {
-                util.logger.info(`${interaction.user.username} has entered an invalid email: ${emailInput}.`);
+                util.logger.info(`${interaction.user.username} has entered an invalid email: ${userEmail}.`);
                 await interaction.followUp({
                     content: 'Please resubmit the form with your university email.', 
                     ephemeral: true,
@@ -207,16 +210,16 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 .setDescription('You will receive an email with a code shortly. ' +
                     'Please enter the code below to confirm your information is correct.')
                 .addFields(
-                    { name: 'Email', value: `${emailInput}` },
+                    { name: 'Email', value: `${userEmail}` },
                     { name: 'Signature', value: `${signatureInput}` },
                 );
             
             // send email to user input email, append user id as key and generated code sent through email as value
             try {
-                generatedCode.set(interaction.user.id, await email.verifyEmail(emailInput));
+                generatedCode.set(interaction.user.id, await email.verifyEmail(userEmail));
             } catch (error) {
                 console.log(error);
-                util.logger.error(`${interaction.user.username} user request to SMTP server failed.`);
+                util.logger.error(`${interaction.user.username} user request to SMTP server failed with email: ${userEmail}.`);
 
                 await interaction.followUp({
                     content: 'Verification email failed to send, please contact a discord moderator to resolve this issue.',
@@ -227,7 +230,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
             
             // append info to google sheets if email sent successfully
             try {
-                await sheets.write(interaction.user.username, emailInput, signatureInput);
+                await sheets.write(interaction.user.username, userEmail, signatureInput);
             } catch (error) {
                 console.log(error);
                 util.logger.error(`Failed to write ${interaction.user.username} user data to Google Sheets.`);
