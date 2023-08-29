@@ -52,6 +52,9 @@ client.on(Events.GuildMemberAdd, async (member) => {
 // create a new map object to store user id as key and generated code as value
 let generatedCode = new Map();
 
+// create new map object to store user id as key and amount of failed verification attempts as value
+let attempts = new Map();
+
 // create initial message and embed
 client.on(Events.MessageCreate, async (message) => {
     // return if message isn't 'verify' or isn't in intended channel
@@ -134,7 +137,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
             if (!generatedCode.has(interaction.user.id)){
                 util.logger.warn(`${interaction.user.username} user data not stored in runtime.`);
                 await interaction.reply({
-                    content: 'Something went wrong, please restart from the beginning.', 
+                    content: 'Something went wrong, please retry from the beginning.', 
                     ephemeral: true,
                 });
                 return;
@@ -216,6 +219,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
             
             // send email to user input email, append user id as key and generated code sent through email as value
             try {
+                // reset user attempts to 0 everytime new code generates
+                attempts.set(interaction.user.id, 0);
                 generatedCode.set(interaction.user.id, await email.verifyEmail(userEmail));
             } catch (error) {
                 console.log(error);
@@ -248,8 +253,8 @@ client.on(Events.InteractionCreate, async (interaction) => {
             const codeInput = interaction.fields.getTextInputValue('code-input').trim();
 
             // get value of generated code corresponding to user id and compare value with user input code
-            // if correct, assign role and delete user entry
             if (generatedCode.get(interaction.user.id) == codeInput) {
+               // asign role if user verification code is correct
                 interaction.member.roles.add(roleId);
                 await interaction.member.send('You have completed Active Member Verification and unlocked channels. ' +
                 'Please keep this DM as receipt.');
@@ -264,6 +269,25 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 });
                 return;
             }
+
+            // check if there are 3 or more current failed attempts
+            if (attempts.get(interaction.user.id) >= 2) {
+                // delete user entry from map
+                generatedCode.delete(interaction.user.id);
+
+                // delete user entry from attempts
+                attempts.delete(interaction.user.id);
+
+                util.logger.info(`${interaction.user.username} has entered incorrect code 3 times.`);
+                await interaction.followUp({
+                    content: 'You have entered the incorrect code too many times. Please retry from the beginning.', 
+                    ephemeral: true,
+                });
+                return;
+            }
+            
+            // increase attempt by 1 on failed attempt
+            attempts.set(interaction.user.id, attempts.get(interaction.user.id) + 1);
 
             util.logger.info(`${interaction.member.user.username} has entered incorrect verification code.`);
             await interaction.followUp({
