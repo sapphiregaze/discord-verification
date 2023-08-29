@@ -18,6 +18,7 @@ const util = require('./logger.js');
 
 const { token, channelId, roleId, allowedDomains, organization } = require('../config.json');
 
+// create client for discord application
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -28,7 +29,7 @@ const client = new Client({
 });
 
 // send welcome message and instructions when new user joins guild
-client.on(Events.GuildMemberAdd, (member) => {
+client.on(Events.GuildMemberAdd, async (member) => {
     const welcome = fs.readFileSync('./templates/welcome.txt').toString();
 
     const WelcomeEmbed = new EmbedBuilder()
@@ -41,19 +42,18 @@ client.on(Events.GuildMemberAdd, (member) => {
         })
         .setDescription(welcome);
 
-    member.send({
+    util.logger.info(`${member.user.username} has joined the guild!`);
+    await member.send({
         content: `Hello ${member.user.username}, welcome to ${organization}!`,
         embeds: [WelcomeEmbed],
     });
-
-    util.logger.info(`${member.user.username} has joined the guild!`);
 });
 
 // create a new map object to store user id as key and generated code as value
 let generatedCode = new Map();
 
 // create initial message and embed
-client.on(Events.MessageCreate, (message) => {
+client.on(Events.MessageCreate, async (message) => {
     // return if message isn't 'verify' or isn't in intended channel
     if (message.channel.id != channelId || message.content != 'verify') return;
 
@@ -81,7 +81,7 @@ client.on(Events.MessageCreate, (message) => {
         .setDescription(agreement);
     
     // reply with embed and button
-    message.reply({
+    await message.reply({
         embeds: [InitialEmbed],
         components: [InitialButton],
     });
@@ -91,7 +91,7 @@ client.on(Events.MessageCreate, (message) => {
 client.on(Events.InteractionCreate, async (interaction) => {
     // return if interaction user already have role
     if (interaction.member.roles.cache.some(role => role.id === roleId)) {
-        interaction.reply({
+        await interaction.reply({
             content: 'You have already completed Active Member Verification!', 
             ephemeral: true,
         });
@@ -133,7 +133,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
             // return if user id is not a key in generatedCode map
             if (!generatedCode.has(interaction.user.id)){
                 util.logger.warn(`${interaction.user.username} user data not stored in runtime.`);
-                interaction.reply({
+                await interaction.reply({
                     content: 'Something went wrong, please restart from the beginning.', 
                     ephemeral: true,
                 });
@@ -161,6 +161,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     // check if interaction type is modal submit
     if (interaction.isModalSubmit()) {
+        // defer reply to avoid interaction token time out
+        await interaction.deferReply({ ephemeral: true });
+
         // check if the modal submit is from initial modal
         if (interaction.customId === 'initial-modal') {
             // obtain input from modal fields
@@ -176,7 +179,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
             // return if user email isn't from an acceptable domain
             if (!AcceptedDomains.has(domain)) {
                 util.logger.info(`${interaction.user.username} has entered an invalid email: ${emailInput}.`);
-                interaction.reply({
+                await interaction.followUp({
                     content: 'Please resubmit the form with your university email.', 
                     ephemeral: true,
                 });
@@ -212,9 +215,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
             try {
                 generatedCode.set(interaction.user.id, await email.verifyEmail(emailInput));
             } catch (error) {
-                util.logger.error(`${interaction.user.username} user request to SMTP server failed.`);
                 console.log(error);
-                interaction.reply({
+                util.logger.error(`${interaction.user.username} user request to SMTP server failed.`);
+
+                await interaction.followUp({
                     content: 'Verification email failed to send, please contact a discord moderator to resolve this issue.',
                     ephemeral: true,
                 });
@@ -225,11 +229,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
             try {
                 await sheets.write(interaction.user.username, emailInput, signatureInput);
             } catch (error) {
-                util.logger.error(`Failed to write ${interaction.user.username} user data to Google Sheets.`);
                 console.log(error);
+                util.logger.error(`Failed to write ${interaction.user.username} user data to Google Sheets.`);
             }
             
-            interaction.reply({
+            await interaction.followUp({
                 embeds: [EmailEmbed],
                 components: [EmailButton], 
                 ephemeral: true,
@@ -244,14 +248,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
             // if correct, assign role and delete user entry
             if (generatedCode.get(interaction.user.id) == codeInput) {
                 interaction.member.roles.add(roleId);
-                interaction.member.send('You have completed Active Member Verification and unlocked channels. ' +
+                await interaction.member.send('You have completed Active Member Verification and unlocked channels. ' +
                 'Please keep this DM as receipt.');
-                util.logger.info(`${interaction.member.user.username} is now an Active Member.`);
 
                 // delete user entry from map
                 generatedCode.delete(interaction.user.id);
 
-                interaction.reply({
+                util.logger.info(`${interaction.member.user.username} is now an Active Member.`);
+                await interaction.followUp({
                     content: 'You have completed Active Member Verification and unlocked channels!', 
                     ephemeral: true,
                 });
@@ -259,7 +263,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
             }
 
             util.logger.info(`${interaction.member.user.username} has entered incorrect verification code.`);
-            interaction.reply({
+            await interaction.followUp({
                 content: 'Your verification code is incorrect, please try again!', 
                 ephemeral: true,
             });

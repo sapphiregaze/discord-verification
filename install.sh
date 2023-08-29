@@ -1,16 +1,16 @@
+#!/usr/bin/env bash 
 
 # install dependencies 
-
 
 sudo apt update -y  || {
    echo "Failed to run 'apt update', aborting bot install "
    exit 1; 
 }
 
-sudo apt upgrade -y  || {
-   echo "Failed to run 'apt upgrade', aborting bot install "
-   exit 1; 
-}
+# sudo apt upgrade -y  || {
+#    echo "Failed to run 'apt upgrade', aborting bot install "
+#    exit 1; 
+# }
 
 
 sudo apt install -y nodejs npm || {
@@ -35,6 +35,7 @@ sudo n stable || {
 
 cd src
 sed "s@WorkingDirectory=@WorkingDirectory=$PWD@g" ../discord-verification.service | sed "s@ExecStart=@ExecStart=/usr/local/bin/node $PWD\/index.js@g" | sudo tee /etc/systemd/system/discord-verification.service 
+#sed "s@WorkingDirectory=@WorkingDirectory=$PWD@g" ../discord-verification.service | sed "s@ExecStart=@ExecStart=`which node` $PWD\/index.js@g" | sudo tee /etc/systemd/system/discord-verification.service 
 
 
 if [ ! -f ../config.json ]
@@ -56,7 +57,3 @@ fi
 echo "Run 'sudo systemctl start discord-verification' after adding configuration file."   
 
 sudo systemctl enable discord-verification
-
-
-
-

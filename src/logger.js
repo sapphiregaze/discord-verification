@@ -1,4 +1,6 @@
 const { createLogger, format, transports } = require('winston');
+
+// define log levels
 const logLevels = {
     fatal: 0,
     error: 1,
@@ -8,6 +10,7 @@ const logLevels = {
     trace: 5,
 };
 
+// export logger for use
 module.exports.logger = createLogger({
     levels: logLevels,
     format: format.combine(format.timestamp(), format.json()),
