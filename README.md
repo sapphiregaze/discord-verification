@@ -39,17 +39,17 @@ Then, create a new file at the root of the repository named `config.json` (check
 
 ```
 {
-   "token": "YOUR-TOKEN-HERE",
-   "channelId": "YOUR-CHANNEL-ID",
-   "roleId": "YOUR-ROLE-ID",
-   "spreadsheetId": "YOUR-SPREADSHEET-ID",
+   "token": "DISCORD-APPLICATION-TOKEN",
+   "channelId": "CHANNEL-ID",
+   "roleId": "ROLE-ID",
+   "spreadsheetId": "SPREADSHEET-ID",
    "allowedDomains": [
-       "YOUR-DOMAIN-1",
-       "YOUR-DOMAIN-2",
+       "DOMAIN-1",
+       "DOMAIN-2",
        ...
    ],
-   "senderEmail": "\"YOUR-ORGANIZATION NAME\" <no-reply@YOUR-DOMAIN>",
-   "organization": "YOUR-ORGANIZATION NAME"
+   "senderEmail": "\"ORGANIZATION NAME\" <no-reply@DOMAIN>",
+   "organization": "ORGANIZATION NAME"
 }
 ```
 
