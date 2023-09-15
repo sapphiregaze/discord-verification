@@ -1,0 +1,8 @@
+node_modules
+Dockerfile
+.dockerignore
+.gitignore
+*.log
+install.sh
+discord-verification.service
+sample.json
