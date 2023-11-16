@@ -1,6 +1,6 @@
 # Discord Member Verification
 
-### Automate discord member verification process using Nodemailer/SMTP server for email verification, assign member role with Discord.js, and store member information using Google Sheets API.
+**Automate discord member verification process using Nodemailer/SMTP server for email verification, assign member role with Discord.js, and store member information using Google Sheets API.**
 
 ![image of an example verification modal](/src/resources/verification.png "verification modal example")
 

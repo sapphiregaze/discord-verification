@@ -1,3 +1,4 @@
+const fs = require('fs');
 const {
     ActionRowBuilder,
     ButtonBuilder,
@@ -13,7 +14,7 @@ const { organization } = require('../config.json');
 const welcome = fs.readFileSync('./templates/welcome.txt').toString();
 
 // build welcome embed sent through DMs
-export const WelcomeEmbed = new EmbedBuilder()
+const WelcomeEmbed = new EmbedBuilder()
     .setColor(0xCFC2E9)
     .setTitle(`Welcome to ${organization}`)
     .setURL('https://github.com/SapphireGaze/discord-verification')
@@ -27,7 +28,7 @@ export const WelcomeEmbed = new EmbedBuilder()
 const agreement = fs.readFileSync('./templates/agreement.txt').toString();
 
 // build initial button
-export const InitialButton = new ActionRowBuilder();
+const InitialButton = new ActionRowBuilder();
 InitialButton.addComponents(
     new ButtonBuilder()
         .setCustomId('initial-button')
@@ -36,7 +37,7 @@ InitialButton.addComponents(
 );
 
 // build initial embed
-export const InitialEmbed = new EmbedBuilder()
+const InitialEmbed = new EmbedBuilder()
     .setColor(0xCFC2E9)
     .setTitle('Active Member Verification')
     .setURL('https://github.com/SapphireGaze/discord-verification')
@@ -47,7 +48,7 @@ export const InitialEmbed = new EmbedBuilder()
     .setDescription(agreement);
 
 // build initial modal
-export const InitialModal = new ModalBuilder()
+const InitialModal = new ModalBuilder()
 .setCustomId('initial-modal')
 .setTitle('Active Member Verification')
 .addComponents([
@@ -69,8 +70,29 @@ export const InitialModal = new ModalBuilder()
     ),
 ]);
 
+// build email verification button
+const EmailButton = new ActionRowBuilder();
+EmailButton.addComponents(
+    new ButtonBuilder()
+        .setCustomId('email-verification-button')
+        .setStyle(ButtonStyle.Success)
+        .setLabel('Enter Email Verification Code'),
+);
+
+// build email verification info embed
+const EmailEmbed = new EmbedBuilder()
+    .setColor(0xCFC2E9)
+    .setTitle('Email Verification')
+    .setURL('https://github.com/SapphireGaze/discord-verification')
+    .setAuthor({
+        name: `${organization}`, 
+        iconURL: 'https://logodix.com/logo/557580.png', 
+    })
+    .setDescription('You will receive an email with a code shortly. ' +
+        'Please enter the code below to confirm your information is correct.');
+
 // build email verification modal
-export const EmailModal = new ModalBuilder()
+const EmailModal = new ModalBuilder()
 .setCustomId('email-verification-modal')
 .setTitle('Email Verification')
 .addComponents([
@@ -84,23 +106,4 @@ export const EmailModal = new ModalBuilder()
     ),
 ]);
 
-// build email verification button
-export const EmailButton = new ActionRowBuilder();
-EmailButton.addComponents(
-    new ButtonBuilder()
-        .setCustomId('email-verification-button')
-        .setStyle(ButtonStyle.Success)
-        .setLabel('Enter Email Verification Code'),
-);
-
-// build email verification info embed
-export const EmailEmbed = new EmbedBuilder()
-    .setColor(0xCFC2E9)
-    .setTitle('Email Verification')
-    .setURL('https://github.com/SapphireGaze/discord-verification')
-    .setAuthor({
-        name: `${organization}`, 
-        iconURL: 'https://logodix.com/logo/557580.png', 
-    })
-    .setDescription('You will receive an email with a code shortly. ' +
-        'Please enter the code below to confirm your information is correct.');
+module.exports = { WelcomeEmbed, InitialButton, InitialEmbed, InitialModal, EmailButton, EmailEmbed, EmailModal};
