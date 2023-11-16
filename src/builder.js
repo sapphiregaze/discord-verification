@@ -8,6 +8,7 @@ const {
     TextInputStyle,
     EmbedBuilder,
 } = require('discord.js');
+
 const { organization } = require('../config.json');
 
 // get welcome message
@@ -106,4 +107,12 @@ const EmailModal = new ModalBuilder()
     ),
 ]);
 
-module.exports = { WelcomeEmbed, InitialButton, InitialEmbed, InitialModal, EmailButton, EmailEmbed, EmailModal};
+module.exports = { 
+    WelcomeEmbed, 
+    InitialButton, 
+    InitialEmbed, 
+    InitialModal, 
+    EmailButton, 
+    EmailEmbed, 
+    EmailModal
+};

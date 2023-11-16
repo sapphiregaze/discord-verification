@@ -4,10 +4,11 @@ const builder = require('./builder.js');
 const email = require('./email.js');
 const sheets = require('./sheets.js');
 const logger = require('./logger.js');
+const util = require('./util.js');
 
 const { token, channelId, roleId, allowedDomains, organization } = require('../config.json');
 
-// create client for discord application
+// create client with intents for discord application
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -17,11 +18,29 @@ const client = new Client({
     ],
 });
 
-// create a new map object to store user id as key and generated code as value
-let generatedCode = new Map();
+// set of acceptable domains
+const AcceptedDomains = new Set(allowedDomains);
 
-// create new map object to store user id as key and amount of failed verification attempts as value
-let attempts = new Map();
+/*
+create a map of users with user id as key and an object as value, object shown below
+
+const user = {
+    email: string,
+    signature: string,
+    verification: {
+        code: long,
+        attempts: int,
+        time: string,
+    },
+};
+*/
+let users = new Map();
+
+// performs when client is ready
+client.on(Events.ClientReady, () => {
+    console.log(`Currently logged in as ${client.user.tag}.\n`);
+    logger.logger.info(`Application logged in as ${client.user.tag}.`);
+});
 
 // send welcome message and instructions when new user joins guild
 client.on(Events.GuildMemberAdd, async (member) => {
@@ -64,9 +83,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
         // check id of button interaction to see if it's email verification button
         if (interaction.customId === 'email-verification-button') {
-            // return if user id is not a key in generatedCode map
-            if (!generatedCode.has(interaction.user.id)){
-                logger.logger.warn(`${interaction.user.username} user data not stored in runtime.`);
+            if (users.get(interaction.user.id).verification.code == null){
+                console.log(users.get(interaction.user.id));
+                logger.logger.warn(`${interaction.user.username} user verification code not stored in runtime.`);
                 await interaction.reply({
                     content: 'Something went wrong, please retry from the beginning.', 
                     ephemeral: true,
@@ -111,9 +130,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
             const validatedEmail = validateEmail(emailInput)[0];
             const domain = validatedEmail.split('@')[1];
 
-            // set of acceptable domains
-            const AcceptedDomains = new Set(allowedDomains);
-
             // return if user email isn't from an acceptable domain
             if (!AcceptedDomains.has(domain)) {
                 logger.logger.info(`${interaction.user.username} has entered an email with invalid domain: ${validatedEmail}.`);
@@ -126,9 +142,16 @@ client.on(Events.InteractionCreate, async (interaction) => {
             
             // send email to user input email, append user id as key and generated code sent through email as value
             try {
-                // reset user attempts to 0 everytime new code generates
-                attempts.set(interaction.user.id, 0);
-                generatedCode.set(interaction.user.id, await email.verifyEmail(validatedEmail));
+                users.set(interaction.user.id, {
+                    email: validatedEmail,
+                    signature: signatureInput,
+                    verification: { 
+                        code: await email.verifyEmail(validatedEmail),
+                        attempts: 1,
+                        time: null,
+                    }
+                });
+                console.log(users.get(interaction.user.id));
             } catch (error) {
                 console.log(error);
                 logger.logger.error(`${interaction.user.username} user request to SMTP server failed with email: ${validatedEmail}.`);
@@ -138,14 +161,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
                     ephemeral: true,
                 });
                 return;
-            }
-
-            // append info to google sheets if email sent successfully
-            try {
-                await sheets.write(interaction.user.username, validatedEmail, signatureInput);
-            } catch (error) {
-                console.log(error);
-                logger.logger.error(`Failed to write ${interaction.user.username} user data to Google Sheets.`);
             }
 
             builder.EmailEmbed.addFields(
@@ -165,14 +180,23 @@ client.on(Events.InteractionCreate, async (interaction) => {
             const codeInput = interaction.fields.getTextInputValue('code-input').trim();
 
             // get value of generated code corresponding to user id and compare value with user input code
-            if (generatedCode.get(interaction.user.id) == codeInput) {
+            if (users.get(interaction.user.id).verification.code == codeInput) {
                // asign role if user verification code is correct
                 interaction.member.roles.add(roleId);
+
+                // append info to google sheets if email sent successfully
+                try {
+                    await sheets.write(interaction.user.username, users.get(interaction.user.id).email, users.get(interaction.user.id).signature);
+                } catch (error) {
+                    console.log(error);
+                    logger.logger.error(`Failed to write ${interaction.user.username} user data to Google Sheets.`);
+                }
+
                 await interaction.member.send('You have completed Active Member Verification and unlocked channels. ' +
                 'Please keep this DM as receipt.');
 
-                // delete user entry from map
-                generatedCode.delete(interaction.user.id);
+                const userData = users.get(interaction.user.id);
+                users.set(interaction.user.id, { ...userData, verification: { code: null, attempts: 1, time: new Date().toLocaleString() } });
 
                 logger.logger.info(`${interaction.member.user.username} is now an Active Member.`);
                 await interaction.followUp({
@@ -183,12 +207,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
             }
 
             // check if there are 3 or more current failed attempts
-            if (attempts.get(interaction.user.id) >= 2) {
-                // delete user entry from map
-                generatedCode.delete(interaction.user.id);
-
-                // delete user entry from attempts
-                attempts.delete(interaction.user.id);
+            if (users.get(interaction.user.id).verification.attempts >= 3) {
+                const userData = users.get(interaction.user.id);
+                users.set(interaction.user.id, { ...userData, verification: { ...userData.verification, code: null, attempts: 1 } });
 
                 logger.logger.info(`${interaction.user.username} has entered incorrect code 3 times.`);
                 await interaction.followUp({
@@ -198,8 +219,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 return;
             }
             
-            // increase attempt by 1 on failed attempt
-            attempts.set(interaction.user.id, attempts.get(interaction.user.id) + 1);
+            const userData = users.get(interaction.user.id);
+            users.set(interaction.user.id, { 
+                ...userData,
+                verification: { 
+                    ...userData.verification,
+                    attempts: userData.verification.attempts + 1,
+                },
+            });
 
             logger.logger.info(`${interaction.member.user.username} has entered incorrect verification code.`);
             await interaction.followUp({
@@ -208,11 +235,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
             });
         }
     }
-});
-
-client.on(Events.ClientReady, () => {
-    console.log(`Currently logged in as ${client.user.tag}.\n`);
-    logger.logger.info(`Application logged in as ${client.user.tag}.`);
 });
 
 client.login(token);
