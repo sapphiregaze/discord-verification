@@ -114,5 +114,5 @@ module.exports = {
     InitialModal, 
     EmailButton, 
     EmailEmbed, 
-    EmailModal
+    EmailModal,
 };

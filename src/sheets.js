@@ -13,17 +13,17 @@ const authClient = new google.auth.JWT(
     ['https://www.googleapis.com/auth/spreadsheets']
 );
 
-module.exports.write = async function (username, email, signature) {
+module.exports.write = async function (time, username, email, signature) {
     // set authorize token
     const token = await authClient.authorize();
     authClient.setCredentials(token);
 
     // append values to correct json format
     let values = [
-        [username, email, signature],
+        [time, username, email, signature],
     ];
 
-    const resources = {
+    const data = {
         values,
     };
     
@@ -33,6 +33,6 @@ module.exports.write = async function (username, email, signature) {
         spreadsheetId: spreadsheetId,
         range: 'A1',
         valueInputOption: 'RAW',
-        resource: resources,
+        resource: data,
     });
 };
