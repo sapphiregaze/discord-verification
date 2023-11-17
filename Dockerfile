@@ -5,16 +5,16 @@ FROM node:18.13-alpine
 WORKDIR /app
 
 # copy package.json & package-lock.json
-COPY package*.json ./
+COPY package.json /app
 
 # install dependencies
 RUN npm install
 
 # copy all files except for dockerignored files into docker image
-COPY . .
+COPY . /app
 
-# change directory into src
-RUN cd src/
+# change working directory to src
+WORKDIR /app/src
 
 # start node process
-CMD [ "node", "src/index.js" ]
+CMD [ "node", "index.js" ]
