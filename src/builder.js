@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 const {
     ActionRowBuilder,
     ButtonBuilder,
@@ -12,7 +13,7 @@ const {
 const { organization } = require('../config.json');
 
 // get welcome message
-const welcome = fs.readFileSync('./templates/welcome.txt').toString();
+const welcome = fs.readFileSync(path.join(__dirname, 'templates', 'welcome.txt')).toString();
 
 // build welcome embed sent through DMs
 const WelcomeEmbed = new EmbedBuilder()
@@ -26,7 +27,7 @@ const WelcomeEmbed = new EmbedBuilder()
     .setDescription(welcome);
 
 // embed initial description content, change to whatever
-const agreement = fs.readFileSync('./templates/agreement.txt').toString();
+const agreement = fs.readFileSync(path.join(__dirname, 'templates', 'agreement.txt')).toString();
 
 // build initial button
 const InitialButton = new ActionRowBuilder();
