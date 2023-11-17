@@ -3,7 +3,7 @@ const nodemailer = require('nodemailer');
 
 const util = require('./logger.js');
 
-const { senderEmail } = require('../config.json');
+const { senderEmail } = require('../../config.json');
 
 // create transporter for nodemailer
 const transporter = nodemailer.createTransport({

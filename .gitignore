@@ -1,9 +1,9 @@
 /node_modules
 
-/config.json
-/credentials.json
+config.json
+credentials.json
 
-/src/templates/welcome.txt
-/src/templates/agreement.txt
+welcome.txt
+agreement.txt
 
 *.log

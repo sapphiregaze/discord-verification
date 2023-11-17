@@ -6,7 +6,7 @@ const sheets = require('./sheets.js');
 const logger = require('./logger.js');
 const util = require('./util.js');
 
-const { token, channelId, roleId, allowedDomains, organization } = require('../config.json');
+const { token, channelId, roleId, allowedDomains, organization } = require('../../config.json');
 
 // create client with intents for discord application
 const client = new Client({
@@ -224,4 +224,4 @@ client.on(Events.InteractionCreate, async (interaction) => {
     }
 });
 
-init();
+module.exports = { init };

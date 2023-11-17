@@ -10,7 +10,7 @@ const {
     EmbedBuilder,
 } = require('discord.js');
 
-const { organization } = require('../config.json');
+const { organization } = require('../../config.json');
 
 // get welcome message
 const welcome = fs.readFileSync(path.join(__dirname, 'templates', 'welcome.txt')).toString();
