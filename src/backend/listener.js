@@ -47,7 +47,7 @@ client.on(Events.ClientReady, () => {
 
 // send welcome message and instructions when new user joins guild
 client.on(Events.GuildMemberAdd, async (member) => {
-    logger.logger.info(`${member.user.username} has joined the guild!`);
+    logger.logger.info(`User ${member.user.username} has joined the guild!`);
     await member.send({
         content: `Hello ${member.user.username}, welcome to ${organization}!`,
         embeds: [builder.WelcomeEmbed],
@@ -88,7 +88,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         if (interaction.customId === 'email-verification-button') {
             // check if user verification code is null
             if (users.get(interaction.user.id).verification.code == null){
-                logger.logger.warn(`${interaction.user.username} user verification code not stored in runtime.`);
+                logger.logger.warn(`User ${interaction.user.username} verification code not stored in runtime.`);
                 await interaction.reply({
                     content: 'Something went wrong, please retry from the beginning.', 
                     ephemeral: true,
@@ -113,7 +113,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
             // return if user input is invalid email
             if (!util.validateEmail(emailInput)) {
-                logger.logger.info(`${interaction.user.username} has entered an invalid email: ${emailInput}.`);
+                logger.logger.info(`User ${interaction.user.username} has entered an invalid email: ${emailInput}.`);
                 await interaction.followUp({
                     content: 'Invalid email format, please try again.',
                 });
@@ -126,7 +126,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
             // return if user email isn't from an acceptable domain
             if (!acceptedDomains.has(domain)) {
-                logger.logger.info(`${interaction.user.username} has entered an email with invalid domain: ${validatedEmail}.`);
+                logger.logger.info(`User ${interaction.user.username} has entered an email with invalid domain: ${validatedEmail}.`);
                 await interaction.followUp({
                     content: 'Please resubmit the form with your university email.', 
                 });
@@ -148,7 +148,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 console.log(users.get(interaction.user.id));
             } catch (error) {
                 console.log(error);
-                logger.logger.error(`${interaction.user.username} user request to SMTP server failed with email: ${validatedEmail}.`);
+                logger.logger.error(`User ${interaction.user.username} request to SMTP server failed.`);
                 await interaction.followUp({
                     content: 'Verification email failed to send, please contact a discord moderator to resolve this issue.',
                 });
@@ -188,13 +188,13 @@ client.on(Events.InteractionCreate, async (interaction) => {
                     );
                 } catch (error) {
                     console.log(error);
-                    logger.logger.error(`Failed to write ${interaction.user.username} user data to Google Sheets.`);
+                    logger.logger.error(`Failed to write User ${interaction.user.username} data to Google Sheets.`);
                 }
 
                 await interaction.member.send('You have completed Active Member Verification and unlocked channels. ' +
                 'Please keep this DM as receipt.');
 
-                logger.logger.info(`${interaction.member.user.username} is now an Active Member.`);
+                logger.logger.info(`User ${interaction.member.user.username} is now an Active Member.`);
                 await interaction.followUp({
                     content: 'You have completed Active Member Verification and unlocked channels!', 
                 });
@@ -209,14 +209,14 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 // nullify user verification code on more than 3 attempts to avoid brute force
                 util.updateUser(users, interaction.user.id, null);
 
-                logger.logger.info(`${interaction.user.username} has entered incorrect code 3 times.`);
+                logger.logger.info(`User ${interaction.user.username} has entered incorrect code 3 times.`);
                 await interaction.followUp({
                     content: 'You have entered the incorrect code too many times. Please retry from the beginning.', 
                 });
                 return;
             }
 
-            logger.logger.info(`${interaction.member.user.username} has entered incorrect verification code.`);
+            logger.logger.info(`User ${interaction.member.user.username} has entered incorrect verification code.`);
             await interaction.followUp({
                 content: 'Your verification code is incorrect, please try again!', 
             });
