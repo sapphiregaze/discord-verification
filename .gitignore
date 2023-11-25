@@ -7,5 +7,5 @@ credentials.json
 welcome.txt
 agreement.txt
 
-users.json
+users.db
 *.log

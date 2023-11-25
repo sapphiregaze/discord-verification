@@ -1,21 +1,21 @@
 const util = require("../../../../backend/util.js");
 
-export default function Members() {
-  const users = util.readJSON("../../../../../../users.json");
+export default async function Members() {
+  const users = await util.getUserData();
 
   return (
-    <main className="flex min-h-screen flex-col items-center p-24 bg-trans text-text">
+    <main className="flex min-h-screen flex-col items-center p-24 bg-background text-text">
       <div className="flex flex-wrap justify-center">
         {users.map((user, index) => (
           <div key={index} className="p-4 m-4 outline outline-offset-2 outline-3 outline-double outline-secondary hover:outline-accent hover:outline-offset-4 hover:outline-8 rounded">
             <div className="max-w-md p-8 sm:flex sm:space-x-6">
               <div className="flex-shrink-0 w-full mb-6 h-44 sm:h-32 sm:w-32 sm:mb-0">
-                <img src={user.pfp} alt={`Profile of ${user.username}`} className="object-cover object-center w-full h-full rounded dark:bg-gray-500" />
+                <img src={user.pfp_url} alt={`Profile of ${user.username}`} className="object-cover object-center w-full h-full rounded dark:bg-gray-500" />
               </div>
               <div className="flex flex-col space-y-4">
                 <div>
                   <h2 className="text-2xl font-semibold">{user.signature}</h2>
-                  <span className="text-sm">{user.username} (@{user.userId})</span>
+                  <span className="text-sm">{user.username} (@{user.user_id})</span>
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center space-x-2">
@@ -26,7 +26,7 @@ export default function Members() {
                   </div>
                   <div className="flex items-center space-x-2">
                     <span className="dark:text-gray-400">
-                      <b>Member since: </b>{user.memberSince}
+                      <b>Member since: </b>{user.member_since}
                     </span>
                   </div>
                 </div>

@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const sqlite3 = require('sqlite3').verbose();
 
 // validate email with regex
 const validateEmail = (email) => {
@@ -52,14 +53,67 @@ function formatISODate(isoDate) {
     return date.toLocaleString('en-US', options);
 }
 
+// write user data to sqlite database
 function writeUserData(user) {
-    const userData = JSON.stringify(user);
-    try {
-        fs.appendFileSync('../../users.json', userData + '\n');
-    } catch (error) {
-        console.error('Error writing to file:', error);
-    }
+    let db = new sqlite3.Database('../../users.db', (err) => {
+        if (err) {
+            return console.error(err.message);
+        } else {
+            console.log('Connected to users database');
+            // create users table if it doesn't exist
+            db.run(`CREATE TABLE IF NOT EXISTS users (
+                user_id TEXT PRIMARY KEY,
+                username TEXT,
+                pfp_url TEXT,
+                email TEXT,
+                signature TEXT,
+                member_since TEXT
+            );`);
+
+            // insert user into the users table, replace if user_id already exists in table
+            db.run(`INSERT OR REPLACE INTO users (user_id, username, pfp_url, email, signature, member_since) 
+                VALUES (?, ?, ?, ?, ?, ?)`,
+                [user.userId, user.username, user.pfp, user.email, user.signature, user.memberSince],
+                (err) => {
+                    if (err) {
+                        return console.error(err.message);
+                    }
+                    console.log(`A row has been inserted with rowid ${this.lastID}`);
+                });
+        }
+        db.close();
+    });
 }
+
+async function getUserData() {
+    return new Promise((resolve, reject) => {
+        let usersArray = [];
+        let db = new sqlite3.Database('../../users.db', sqlite3.OPEN_READONLY, (err) => {
+            if (err) {
+                reject(err);
+            } else {
+                console.log('Connected to users database');
+
+                db.each(`SELECT * FROM users`, [],
+                    (err, row) => {
+                        if (err) {
+                            reject(err);
+                        }
+                        usersArray.push(row);
+                    },
+                    (err) => {
+                        if (err) {
+                            reject(err);
+                        }
+                        resolve(usersArray);
+                    }
+                );
+            }
+            db.close();
+        });
+    });
+}
+
 
 module.exports = {
     validateEmail,
@@ -67,4 +121,5 @@ module.exports = {
     readJSON,
     formatISODate,
     writeUserData,
+    getUserData,
 };
