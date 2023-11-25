@@ -155,7 +155,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 return;
             }
 
-            builder.EmailEmbed.addFields(
+            builder.EmailEmbed.setFields(
                 { name: 'Email', value: `${validatedEmail}` },
                 { name: 'Signature', value: `${signatureInput}` },
             );
@@ -176,7 +176,21 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 interaction.member.roles.add(roleId);
 
                 // update user data with verification time
-                util.updateUser(users, interaction.user.id, new Date().toLocaleString());
+                util.updateUser(
+                    users, 
+                    interaction.user.id, 
+                    users.get(interaction.user.id).verification.code, 
+                    new Date().toLocaleString()
+                );
+
+                util.writeUserData({
+                    userId: interaction.user.id,
+                    username: interaction.user.username,
+                    pfp: interaction.user.avatarURL(),
+                    email: users.get(interaction.user.id).email,
+                    signature: users.get(interaction.user.id).signature,
+                    memberSince: users.get(interaction.user.id).verification.time,
+                });
 
                 // append user data to google sheets
                 try {
@@ -207,7 +221,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
             // check if there are more than 3 attempts
             if (users.get(interaction.user.id).verification.attempts > 3) {
                 // nullify user verification code on more than 3 attempts to avoid brute force
-                util.updateUser(users, interaction.user.id, null);
+                util.updateUser(users, interaction.user.id, null, null);
 
                 logger.logger.info(`User ${interaction.user.username} has entered incorrect code 3 times.`);
                 await interaction.followUp({

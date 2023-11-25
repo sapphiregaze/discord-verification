@@ -2,7 +2,7 @@ const util = require("../../../../backend/util.js");
 
 export default function Logs() {
   let logDisplay = '';
-  const logs = util.readLogs("../../../../../../application.log");
+  const logs = util.readJSON("../../../../../../application.log");
   
   logs.forEach((log) => {
     logDisplay = logDisplay.concat(log.level.toUpperCase(), " - ", 

@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const readline = require('readline');
 
 // validate email with regex
 const validateEmail = (email) => {
@@ -12,12 +11,12 @@ const validateEmail = (email) => {
 };
 
 // update user data
-function updateUser(users, userId, time) {
+function updateUser(users, userId, code, time) {
     const userData = users.get(userId);
     users.set(userId, { 
         ...userData, 
         verification: { 
-            code: null, 
+            code: code, 
             attempts: 1, 
             time: time,
         },
@@ -25,24 +24,24 @@ function updateUser(users, userId, time) {
 }
 
 // get content of logs
-function readLogs(filePath) {
+function readJSON(filePath) {
     const absolutePath = path.isAbsolute(filePath) 
         ? filePath 
         : path.join(__dirname, filePath);
 
-    const logJSON = [];
-    const logContent = fs.readFileSync(absolutePath, 'utf8').trim().split('\n');
+    const arrayJSON = [];
+    const content = fs.readFileSync(absolutePath, 'utf8').trim().split('\n');
 
-    logContent.forEach((line) => {
+    content.forEach((line) => {
         try {
             const jsonObject = JSON.parse(line);
-            logJSON.push(jsonObject);
+            arrayJSON.push(jsonObject);
         } catch (error) {
             console.error('Error parsing JSON:', error);
         }
     });
   
-    return logJSON;  
+    return arrayJSON;  
 }
 
 // format ISO 8601 date string into readable string
@@ -53,9 +52,19 @@ function formatISODate(isoDate) {
     return date.toLocaleString('en-US', options);
 }
 
+function writeUserData(user) {
+    const userData = JSON.stringify(user);
+    try {
+        fs.appendFileSync('../../users.json', userData + '\n');
+    } catch (error) {
+        console.error('Error writing to file:', error);
+    }
+}
+
 module.exports = {
     validateEmail,
     updateUser,
-    readLogs,
+    readJSON,
     formatISODate,
+    writeUserData,
 };
