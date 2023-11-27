@@ -48,12 +48,10 @@ function readJSON(filePath) {
 // format ISO 8601 date string into readable string
 function formatISODate(isoDate) {
     const date = new Date(isoDate);
-    const options = { hour: 'numeric', minute: 'numeric', second: 'numeric', timeZoneName: 'short' };
-
-    return date.toLocaleString('en-US', options);
+    return date.toLocaleString('en-US');
 }
 
-// write user data to sqlite database
+// write user data to users table in sqlite database
 function writeUserData(user) {
     let db = new sqlite3.Database('../../users.db', (err) => {
         if (err) {
@@ -85,6 +83,7 @@ function writeUserData(user) {
     });
 }
 
+// query data from the users table within the database
 async function getUserData() {
     return new Promise((resolve, reject) => {
         let usersArray = [];

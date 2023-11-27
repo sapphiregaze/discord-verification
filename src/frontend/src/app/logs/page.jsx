@@ -5,8 +5,8 @@ export default function Logs() {
   const logs = util.readJSON("../../../../../../application.log");
   
   logs.forEach((log) => {
-    logDisplay = logDisplay.concat(log.level.toUpperCase(), " - ", 
-      util.formatISODate(log.timestamp), " - ", log.message, "\n");
+    logDisplay = logDisplay.concat(log.level.toUpperCase(), " - [", 
+      util.formatISODate(log.timestamp), "] - ", log.message, "\n");
   });
 
   return (

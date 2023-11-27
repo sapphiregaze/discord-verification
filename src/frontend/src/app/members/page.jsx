@@ -1,7 +1,15 @@
 const util = require("../../../../backend/util.js");
+const logger = require("../../../../backend/logger.js");
 
 export default async function Members() {
-  const users = await util.getUserData();
+  let users = [];
+
+  try {
+    users = await util.getUserData();
+  } catch (err) {
+    logger.logger.warn("Cannot open SQLite Database or User table not found.");
+    console.log(err);
+  }
 
   return (
     <main className="flex min-h-screen flex-col items-center p-24 bg-background text-text">
