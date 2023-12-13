@@ -1,3 +1,4 @@
+const path = require('path');
 const { Client, Events, GatewayIntentBits } = require('discord.js');
 
 const builder = require('./builder.js');
@@ -6,7 +7,7 @@ const sheets = require('./sheets.js');
 const logger = require('./logger.js');
 const util = require('./util.js');
 
-const { token, channelId, roleId, allowedDomains, organization } = require('../../config.json');
+require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') });
 
 // create client with intents for discord application
 const client = new Client({
@@ -19,6 +20,7 @@ const client = new Client({
 });
 
 // set of acceptable domains
+const { allowedDomains } = require('../../domains.json');
 const acceptedDomains = new Set(allowedDomains);
 
 /*
@@ -37,7 +39,7 @@ const user = {
 let users = new Map();
 
 // initialize bot
-function init() { client.login(token); }
+function init() { client.login(process.env.TOKEN); }
 
 // performs when client is ready
 client.on(Events.ClientReady, () => {
@@ -49,7 +51,7 @@ client.on(Events.ClientReady, () => {
 client.on(Events.GuildMemberAdd, async (member) => {
     logger.logger.info(`User ${member.user.username} has joined the guild!`);
     await member.send({
-        content: `Hello ${member.user.username}, welcome to ${organization}!`,
+        content: `Hello ${member.user.username}, welcome to ${process.env.ORGANIZATION}!`,
         embeds: [builder.WelcomeEmbed],
     });
 });
@@ -57,7 +59,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
 // create initial message and embed
 client.on(Events.MessageCreate, async (message) => {
     // return if message isn't 'verify' or isn't in intended channel
-    if (message.channel.id != channelId || message.content != 'verify') return;
+    if (message.channel.id != process.env.CHANNEL_ID || message.content != 'verify') return;
     
     // reply with embed and button
     await message.reply({
@@ -69,7 +71,7 @@ client.on(Events.MessageCreate, async (message) => {
 // called on every interaction
 client.on(Events.InteractionCreate, async (interaction) => {
     // return if interaction user already have role
-    if (interaction.member.roles.cache.some(role => role.id === roleId)) {
+    if (interaction.member.roles.cache.some(role => role.id === process.env.ROLE_ID)) {
         await interaction.reply({
             content: 'You have already completed Active Member Verification!', 
             ephemeral: true,
@@ -173,7 +175,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
             // compare user verification code with input
             if (users.get(interaction.user.id).verification.code == codeInput) {
                // asign role if user verification code is correct
-                interaction.member.roles.add(roleId);
+                interaction.member.roles.add(process.env.ROLE_ID);
 
                 // update user data with verification time
                 util.updateUser(

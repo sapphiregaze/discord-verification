@@ -1,11 +1,12 @@
 /node_modules
 
-.env
-config.json
+.env*
+!.env*.example
 credentials.json
 
+domains.json
 welcome.txt
 agreement.txt
 
-users.db
 *.log
+users.db

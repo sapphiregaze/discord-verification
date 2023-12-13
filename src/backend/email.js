@@ -4,7 +4,7 @@ const nodemailer = require('nodemailer');
 
 const util = require('./logger.js');
 
-const { senderEmail } = require('../../config.json');
+require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') });
 
 // create transporter for nodemailer
 const transporter = nodemailer.createTransport({
@@ -51,7 +51,7 @@ module.exports.verifyEmail = async function (receiverEmail) {
 	const html = modifyHTML(code);
 
 	const info = await transporter.sendMail({
-		from: senderEmail,
+		from: process.env.SENDER_EMAIL,
 		to: receiverEmail,
 		subject: 'Discord Member Verification Code',
 		html: html,

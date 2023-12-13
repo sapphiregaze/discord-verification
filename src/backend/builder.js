@@ -10,7 +10,7 @@ const {
     EmbedBuilder,
 } = require('discord.js');
 
-const { organization } = require('../../config.json');
+require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') });
 
 // get welcome message
 const welcome = fs.readFileSync(path.join(__dirname, 'templates', 'welcome.txt')).toString();
@@ -18,10 +18,10 @@ const welcome = fs.readFileSync(path.join(__dirname, 'templates', 'welcome.txt')
 // build welcome embed sent through DMs
 const WelcomeEmbed = new EmbedBuilder()
     .setColor(0xCFC2E9)
-    .setTitle(`Welcome to ${organization}`)
+    .setTitle(`Welcome to ${process.env.ORGANIZATION}`)
     .setURL('https://github.com/SapphireGaze/discord-verification')
     .setAuthor({
-        name: `${organization}`, 
+        name: `${process.env.ORGANIZATION}`, 
         iconURL: 'https://logodix.com/logo/557580.png', 
     })
     .setDescription(welcome);
@@ -44,7 +44,7 @@ const InitialEmbed = new EmbedBuilder()
     .setTitle('Active Member Verification')
     .setURL('https://github.com/SapphireGaze/discord-verification')
     .setAuthor({
-        name: `${organization}`, 
+        name: `${process.env.ORGANIZATION}`, 
         iconURL: 'https://logodix.com/logo/557580.png', 
     })
     .setDescription(agreement);
@@ -87,7 +87,7 @@ const EmailEmbed = new EmbedBuilder()
     .setTitle('Email Verification')
     .setURL('https://github.com/SapphireGaze/discord-verification')
     .setAuthor({
-        name: `${organization}`, 
+        name: `${process.env.ORGANIZATION}`, 
         iconURL: 'https://logodix.com/logo/557580.png', 
     })
     .setDescription('You will receive an email with a code shortly. ' +
