@@ -113,6 +113,32 @@ async function getUserData() {
     });
 }
 
+const getUserById = (user_id) => {
+    return new Promise((resolve, reject) => {
+        let db = new sqlite3.Database('../../users.db', sqlite3.OPEN_READONLY, (err) => {
+            if (err) {
+                reject(err);
+            } else {
+                db.get(`SELECT * FROM users 
+                    WHERE user_id = ?`, [user_id], (err, row) => {
+                    db.close((closeErr) => {
+                        if (closeErr) {
+                            reject(closeErr);
+                        } else {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                resolve(row);
+                            }
+                        }
+                    });
+                });
+            }
+        });
+    });
+};
+
+
 
 module.exports = {
     validateEmail,
@@ -121,4 +147,5 @@ module.exports = {
     formatISODate,
     writeUserData,
     getUserData,
+    getUserById,
 };

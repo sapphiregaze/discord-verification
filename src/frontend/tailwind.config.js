@@ -6,18 +6,17 @@ module.exports = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    colors: {
-      'text': '#e5f6f3',
-      'background': '#1e1f19',
-      'primary': '#6B8F71',
-      'secondary': '#AAD2BA',
-      'accent': '#dbfff5',
-    },
     extend: {
+      colors: {
+        'text': '#e5f6f3',
+        'background': '#1e1f19',
+        'primary': '#6B8F71',
+        'secondary': '#AAD2BA',
+        'accent': '#dbfff5',
+      },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-conic':
-          'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
     },
   },
