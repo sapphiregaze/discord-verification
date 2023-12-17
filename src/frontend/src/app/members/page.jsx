@@ -15,11 +15,11 @@ export default async function Members() {
 
   return (
     <>
-      <main className="flex min-h-screen flex-col items-center p-24 bg-background text-text font-mono">
+      <main className="flex min-h-screen flex-col items-center p-24">
         <div className="flex flex-wrap justify-center">
           {users.map((user, index) => (
             <Link key={index} href={`/members/${user.user_id}`}>
-              <div className="p-4 m-4 outline outline-offset-2 outline-3 outline-secondary hover:outline-accent hover:outline-offset-4 hover:outline-8 rounded-3xl">
+              <div className="p-4 m-6 outline outline-offset-2 outline-3 outline-secondary hover:outline-primary hover:outline-offset-4 hover:outline-8 rounded-3xl">
                 <div className="max-w-md p-8 sm:flex sm:space-x-6">
                   <div className="flex-shrink-0 w-full mb-6 h-44 sm:h-32 sm:w-32 sm:mb-0">
                     <img src={user.pfp_url} alt={`Profile of ${user.username}`} className="object-cover object-center w-full h-full rounded-3xl" />

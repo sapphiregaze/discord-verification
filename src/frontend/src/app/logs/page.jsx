@@ -11,7 +11,7 @@ export default function Logs() {
 
   return (
     <>
-      <main className="flex min-h-screen flex-col items-center p-24 bg-background text-text">
+      <main className="flex min-h-screen flex-col items-center p-24">
         <code className="max-h-96 max-w-7xl bg-[#16161D] p-8 m-8 overflow-auto rounded-md">
           <pre>
             <div>{logDisplay}</div>

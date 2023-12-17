@@ -16,8 +16,10 @@ export default function RootLayout({ children }) {
         <link rel="png" href="/favicon.ico" sizes="any"/>
       </head>
       <body className={inter.className}>
-        <Navbar/>
-        {children}
+        <div className="bg-no-repeat bg-cover bg-center bg-fixed bg-[linear-gradient(to_bottom,rgba(30,31,25,1),rgba(107,143,113,0.85)),url('/forest.jpg')] text-text font-mono">
+          <Navbar/>
+          {children}
+        </div>
       </body>
     </html>
   )
