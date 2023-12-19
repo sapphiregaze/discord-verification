@@ -1,20 +1,14 @@
 const fs = require('fs');
+const path = require('path');
 const nodemailer = require('nodemailer');
 
 const util = require('./logger.js');
 
-const { senderEmail } = require('../config.json');
+require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') });
 
 // create transporter for nodemailer
-const transporter = nodemailer.createTransport({
-	host: 'localhost',
-	port: 587,
-	requireTLS: true,
-	secure: false,
-	tls: {
-		rejectUnauthorized: false
-	},
-});
+const transporterConfig = require('../../transporter.json');
+const transporter = nodemailer.createTransport(transporterConfig);
 
 // generate 6 digits random code
 function generateCode() {
@@ -24,7 +18,7 @@ function generateCode() {
 // replace default 000000 code in html page with random generated code
 function modifyHTML(code) {
 	// get verification email html content and load content 
-	let html = fs.readFileSync('./templates/verification.html').toString();
+	let html = fs.readFileSync(path.join(__dirname, 'templates', 'verification.html')).toString();
 	const $ = require('cheerio').load(html);
 
 	const replaceRegex = /000000/;
@@ -50,7 +44,7 @@ module.exports.verifyEmail = async function (receiverEmail) {
 	const html = modifyHTML(code);
 
 	const info = await transporter.sendMail({
-		from: senderEmail,
+		from: process.env.SENDER_EMAIL,
 		to: receiverEmail,
 		subject: 'Discord Member Verification Code',
 		html: html,

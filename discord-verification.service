@@ -4,7 +4,7 @@ Description=automate discord member verification process
 [Service]
 WorkingDirectory=
 Type=simple
-ExecStart=sudo docker run -d service/discord-verification
+ExecStart=sudo docker run --network=host -d service/discord-verification
 Restart=always
 
 [Install]

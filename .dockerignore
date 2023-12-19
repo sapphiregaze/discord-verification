@@ -6,4 +6,5 @@ Dockerfile
 *.log
 install.sh
 discord-verification.service
-sample.json
+.env.example
+*.db

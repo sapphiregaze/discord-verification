@@ -1,9 +1,10 @@
+const path = require('path');
 const { google } = require('googleapis');
 
 const service = google.sheets('v4');
-const credentials = require('../credentials.json');
+const credentials = require('../../credentials.json');
 
-const { spreadsheetId } = require('../config.json');
+require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') });
 
 // configure auth client
 const authClient = new google.auth.JWT(
@@ -30,7 +31,7 @@ module.exports.write = async function (time, username, email, signature) {
     // append values to the next available line as raw input
     await service.spreadsheets.values.append({
         auth: authClient,
-        spreadsheetId: spreadsheetId,
+        spreadsheetId: process.env.SPREADSHEET_ID,
         range: 'A1',
         valueInputOption: 'RAW',
         resource: data,

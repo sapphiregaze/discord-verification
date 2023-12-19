@@ -10,24 +10,37 @@ const {
     EmbedBuilder,
 } = require('discord.js');
 
-const { organization } = require('../config.json');
+const logger = require('./logger.js');
+require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') });
 
 // get welcome message
-const welcome = fs.readFileSync(path.join(__dirname, 'templates', 'welcome.txt')).toString();
+let welcome = `Welcome to ${process.env.ORGANIZATION}! We hope you enjoy your stay here!!`;
+try {
+    welcome = fs.readFileSync(path.join(__dirname, 'templates', 'welcome.txt')).toString();
+} catch (error) {
+    console.log(error);
+    logger.logger.error(`welcome.txt failed to open.`);
+}
 
 // build welcome embed sent through DMs
 const WelcomeEmbed = new EmbedBuilder()
     .setColor(0xCFC2E9)
-    .setTitle(`Welcome to ${organization}`)
+    .setTitle(`Welcome to ${process.env.ORGANIZATION}`)
     .setURL('https://github.com/SapphireGaze/discord-verification')
     .setAuthor({
-        name: `${organization}`, 
+        name: `${process.env.ORGANIZATION}`, 
         iconURL: 'https://logodix.com/logo/557580.png', 
     })
     .setDescription(welcome);
 
 // embed initial description content, change to whatever
-const agreement = fs.readFileSync(path.join(__dirname, 'templates', 'agreement.txt')).toString();
+let agreement = `By proceeding with the verification process, you agree to the terms and conditions of the ${process.env.ORGANIZATION}.`;
+try {
+    agreement = fs.readFileSync(path.join(__dirname, 'templates', 'agreement.txt')).toString();
+} catch (error) {
+    console.log(error);
+    logger.logger.error(`agreement.txt failed to open.`);
+}
 
 // build initial button
 const InitialButton = new ActionRowBuilder();
@@ -44,7 +57,7 @@ const InitialEmbed = new EmbedBuilder()
     .setTitle('Active Member Verification')
     .setURL('https://github.com/SapphireGaze/discord-verification')
     .setAuthor({
-        name: `${organization}`, 
+        name: `${process.env.ORGANIZATION}`, 
         iconURL: 'https://logodix.com/logo/557580.png', 
     })
     .setDescription(agreement);
@@ -87,7 +100,7 @@ const EmailEmbed = new EmbedBuilder()
     .setTitle('Email Verification')
     .setURL('https://github.com/SapphireGaze/discord-verification')
     .setAuthor({
-        name: `${organization}`, 
+        name: `${process.env.ORGANIZATION}`, 
         iconURL: 'https://logodix.com/logo/557580.png', 
     })
     .setDescription('You will receive an email with a code shortly. ' +

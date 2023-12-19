@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 30,31,25;
+  --background-rgb: 229,246,243;
+  --primary-rgb: 107,143,113;
+  --secondary-rgb: 170,210,186;
+  --accent-rgb: 219,255,245;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 229,246,243;
+    --background-rgb: 30,31,25;
+    --primary-rgb: 107,143,113;
+    --secondary-rgb: 170,210,186;
+    --accent-rgb: 219,255,245;
+  }
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-rgb))
+    )
+    rgb(var(--primary-rgb));
+}
