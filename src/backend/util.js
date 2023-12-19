@@ -51,35 +51,55 @@ function formatISODate(isoDate) {
     return date.toLocaleString('en-US');
 }
 
-// write user data to users table in sqlite database
-function writeUserData(user) {
-    let db = new sqlite3.Database('../../users.db', (err) => {
+async function createTableIfNotExists(db) {
+    return new Promise((resolve, reject) => {
+        db.run(`CREATE TABLE IF NOT EXISTS users (
+            user_id TEXT PRIMARY KEY,
+            username TEXT,
+            pfp_url TEXT,
+            email TEXT,
+            signature TEXT,
+            member_since TEXT
+        );`, (err) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve();
+            }
+        });
+    });
+}
+
+async function insertOrUpdateUser(db, user) {
+    return new Promise((resolve, reject) => {
+        db.run(`INSERT OR REPLACE INTO users (user_id, username, pfp_url, email, signature, member_since) 
+            VALUES (?, ?, ?, ?, ?, ?)`,
+            [user.userId, user.username, user.pfp, user.email, user.signature, user.memberSince],
+            function (err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    console.log(`A row has been inserted with rowid ${this.lastID}`);
+                    resolve();
+                }
+            });
+    });
+}
+
+async function writeUserData(user) {
+    let db = new sqlite3.Database('../../users.db', async (err) => {
         if (err) {
             return console.error(err.message);
-        } else {
-            console.log('Connected to users database');
-            // create users table if it doesn't exist
-            db.run(`CREATE TABLE IF NOT EXISTS users (
-                user_id TEXT PRIMARY KEY,
-                username TEXT,
-                pfp_url TEXT,
-                email TEXT,
-                signature TEXT,
-                member_since TEXT
-            );`);
-
-            // insert user into the users table, replace if user_id already exists in table
-            db.run(`INSERT OR REPLACE INTO users (user_id, username, pfp_url, email, signature, member_since) 
-                VALUES (?, ?, ?, ?, ?, ?)`,
-                [user.userId, user.username, user.pfp, user.email, user.signature, user.memberSince],
-                (err) => {
-                    if (err) {
-                        return console.error(err.message);
-                    }
-                    console.log(`A row has been inserted with rowid ${this.lastID}`);
-                });
         }
-        db.close();
+
+        try {
+            await createTableIfNotExists(db);
+            await insertOrUpdateUser(db, user);
+        } catch (error) {
+            console.error(error.message);
+        } finally {
+            db.close();
+        }
     });
 }
 
@@ -91,8 +111,6 @@ async function getUserData() {
             if (err) {
                 reject(err);
             } else {
-                console.log('Connected to users database');
-
                 db.each(`SELECT * FROM users`, [],
                     (err, row) => {
                         if (err) {

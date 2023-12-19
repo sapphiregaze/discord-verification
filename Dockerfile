@@ -19,12 +19,12 @@ WORKDIR /app/src/frontend
 # install frontend dependencies
 RUN npm install
 
-# expose port 3000
+# expose port 587 and 3000
+EXPOSE 587
 EXPOSE 3000
-ENV PORT 3000
 
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
 
 # start node process
-CMD [ "node", "server.js" ]
+CMD [ "npm", "start" ]

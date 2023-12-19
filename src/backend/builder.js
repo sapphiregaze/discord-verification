@@ -10,10 +10,17 @@ const {
     EmbedBuilder,
 } = require('discord.js');
 
+const logger = require('./logger.js');
 require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') });
 
 // get welcome message
-const welcome = fs.readFileSync(path.join(__dirname, 'templates', 'welcome.txt')).toString();
+let welcome = `Welcome to ${process.env.ORGANIZATION}! We hope you enjoy your stay here!!`;
+try {
+    welcome = fs.readFileSync(path.join(__dirname, 'templates', 'welcome.txt')).toString();
+} catch (error) {
+    console.log(error);
+    logger.logger.error(`welcome.txt failed to open.`);
+}
 
 // build welcome embed sent through DMs
 const WelcomeEmbed = new EmbedBuilder()
@@ -27,7 +34,13 @@ const WelcomeEmbed = new EmbedBuilder()
     .setDescription(welcome);
 
 // embed initial description content, change to whatever
-const agreement = fs.readFileSync(path.join(__dirname, 'templates', 'agreement.txt')).toString();
+let agreement = `By proceeding with the verification process, you agree to the terms and conditions of the ${process.env.ORGANIZATION}.`;
+try {
+    agreement = fs.readFileSync(path.join(__dirname, 'templates', 'agreement.txt')).toString();
+} catch (error) {
+    console.log(error);
+    logger.logger.error(`agreement.txt failed to open.`);
+}
 
 // build initial button
 const InitialButton = new ActionRowBuilder();
