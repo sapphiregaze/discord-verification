@@ -1,13 +1,13 @@
 {
-	"host": "localhost",
-	"port": 587,
-	"requireTLS": true,
-	"secure": false,
-    "auth": {
-        "user": null,
-        "pass": null
-    },
-	"tls": {
-		"rejectUnauthorized": false
-	}
+  "host": "localhost",
+  "port": 587,
+  "requireTLS": true,
+  "secure": false,
+  "auth": {
+    "user": null,
+    "pass": null
+  },
+  "tls": {
+    "rejectUnauthorized": false
+  }
 }
