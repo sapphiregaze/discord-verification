@@ -7,15 +7,8 @@ const util = require('./logger.js');
 require('dotenv').config({ path: path.join(__dirname, '..', '..', '.env') });
 
 // create transporter for nodemailer
-const transporter = nodemailer.createTransport({
-	host: 'localhost',
-	port: 587,
-	requireTLS: true,
-	secure: false,
-	tls: {
-		rejectUnauthorized: false
-	},
-});
+const transporterConfig = require('../../transporter.json');
+const transporter = nodemailer.createTransport(transporterConfig);
 
 // generate 6 digits random code
 function generateCode() {

@@ -59,7 +59,7 @@ client.on(Events.GuildMemberAdd, async (member) => {
 // create initial message and embed
 client.on(Events.MessageCreate, async (message) => {
     // return if message isn't 'verify' or isn't in intended channel
-    if (message.channel.id != process.env.CHANNEL_ID || message.content != 'verify') return;
+    if (message.channel.id != process.env.CHANNEL_ID || message.content != '!verify') return;
     
     // reply with embed and button
     await message.reply({
