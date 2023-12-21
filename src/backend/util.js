@@ -30,6 +30,12 @@ function readJSON(filePath) {
         ? filePath 
         : path.join(__dirname, filePath);
 
+    // check if the file exists before attempting to read it
+    if (!fs.existsSync(absolutePath)) {
+        console.error(`File not found: ${absolutePath}`);
+        return [];
+    }
+
     const arrayJSON = [];
     const content = fs.readFileSync(absolutePath, 'utf8').trim().split('\n');
 

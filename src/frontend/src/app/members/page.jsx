@@ -1,4 +1,4 @@
-import Link from "next/link.js";
+import Link from "next/link";
 
 const { getUserData } = require("../../../../backend/util.js");
 const logger = require("../../../../backend/logger.js");
@@ -19,7 +19,7 @@ export default async function Members() {
         <div className="flex flex-wrap justify-center">
           {users.map((user, index) => (
             <Link key={index} href={`/members/${user.user_id}`}>
-              <div className="p-4 m-6 outline outline-offset-2 outline-3 outline-secondary hover:outline-primary hover:outline-offset-4 hover:outline-8 rounded-3xl">
+              <div className="p-4 m-6 outline outline-offset-2 outline-3 outline-secondary hover:outline-primary hover:outline-offset-4 hover:outline-8 hover:animate-pulse rounded-3xl">
                 <div className="max-w-md p-8 sm:flex sm:space-x-6">
                   <div className="flex-shrink-0 w-full mb-6 h-44 sm:h-32 sm:w-32 sm:mb-0">
                     <img src={user.pfp_url} alt={`Profile of ${user.username}`} className="object-cover object-center w-full h-full rounded-3xl" />

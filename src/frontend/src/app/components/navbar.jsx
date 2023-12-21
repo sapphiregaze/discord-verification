@@ -10,13 +10,13 @@ export const Navbar = () => {
         </Link>
         <div className="flex space-x-12 text-accent text-2xl">
           <Link href="/">
-            <div className="hover:text-primary hover:font-bold">Home</div>
+            <div className="hover:text-primary hover:font-bold hover:animate-bounce">Home</div>
           </Link>
           <Link href="/members">
-            <div className="hover:text-primary hover:font-bold">Members</div>
+            <div className="hover:text-primary hover:font-bold hover:animate-bounce">Members</div>
           </Link>
           <Link href="/logs">
-            <div className="hover:text-primary hover:font-bold">Logs</div>
+            <div className="hover:text-primary hover:font-bold hover:animate-bounce">Logs</div>
           </Link>
         </div>        
       </nav>
