@@ -70,9 +70,9 @@ const InitialModal = new ModalBuilder()
     new ActionRowBuilder().addComponents(
         new TextInputBuilder()
             .setCustomId('email-input')
-            .setLabel('University Email')
+            .setLabel('Organization Email')
             .setStyle(TextInputStyle.Short)
-            .setPlaceholder('E.g. adalovelace@universitydomain.edu')
+            .setPlaceholder('E.g. adalovelace@organization.edu')
             .setRequired(true),
     ),
     new ActionRowBuilder().addComponents(

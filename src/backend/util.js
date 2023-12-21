@@ -11,6 +11,14 @@ const validateEmail = (email) => {
         );
 };
 
+// validate signature with regex
+const validateSignature = (signature) => {
+    return String(signature)
+        .match(
+            /^([a-zA-Z]{2,}\s[a-zA-Z]{1,}'?-?[a-zA-Z]{2,}\s?([a-zA-Z]{1,})?)/
+        );
+}
+
 // update user data
 function updateUser(users, userId, code, time) {
     const userData = users.get(userId);
@@ -166,6 +174,7 @@ const getUserById = (user_id) => {
 
 module.exports = {
     validateEmail,
+    validateSignature,
     updateUser,
     readJSON,
     formatISODate,

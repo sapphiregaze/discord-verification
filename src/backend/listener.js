@@ -113,16 +113,17 @@ client.on(Events.InteractionCreate, async (interaction) => {
             const emailInput = interaction.fields.getTextInputValue('email-input').trim();
             const signatureInput = interaction.fields.getTextInputValue('signature-input').trim();
 
-            // return if user input is invalid email
-            if (!util.validateEmail(emailInput)) {
-                logger.logger.info(`User ${interaction.user.username} has entered an invalid email: ${emailInput}.`);
+            // return if user input is invalid email/signature
+            if (!util.validateEmail(emailInput) || !util.validateSignature(signatureInput)) {
+                logger.logger.info(`User ${interaction.user.username} has entered an invalid email/signature: ${emailInput}, ${signatureInput}.`);
                 await interaction.followUp({
-                    content: 'Invalid email format, please try again.',
+                    content: 'Invalid email/signature format, please try again.',
                 });
                 return;
             }
 
-            // validate user input and parse domain
+            // validate user inputs and parse domain
+            const validatedSignature = util.validateSignature(signatureInput)[0];
             const validatedEmail = util.validateEmail(emailInput)[0];
             const domain = validatedEmail.split('@')[1];
 
@@ -140,7 +141,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
                 // create user data object and insert it into users map
                 users.set(interaction.user.id, {
                     email: validatedEmail,
-                    signature: signatureInput,
+                    signature: validatedSignature,
                     verification: { 
                         code: await email.verifyEmail(validatedEmail),
                         attempts: 1,
@@ -159,7 +160,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
             builder.EmailEmbed.setFields(
                 { name: 'Email', value: `${validatedEmail}` },
-                { name: 'Signature', value: `${signatureInput}` },
+                { name: 'Signature', value: `${validatedSignature}` },
             );
             
             await interaction.followUp({
